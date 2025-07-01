@@ -11,7 +11,6 @@ from applications.doctor.utils.pago import MetodoPagoChoices, EstadoPagoChoices
 """
 
 class HorarioAtencion(models.Model):
-
     # Día de la semana (ej: lunes, martes...)
     dia_semana = models.CharField(
         max_length=10,

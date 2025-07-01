@@ -51,6 +51,7 @@ LOCAL_APPS = [
     'applications.security.apps.SecurityConfig',
     'applications.core.apps.CoreConfig',
     'applications.doctor.apps.DoctorConfig',
+    'applications.citas.apps.CitasConfig',
 ]
 INSTALLED_APPS = INSTALLED_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
