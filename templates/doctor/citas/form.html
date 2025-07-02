@@ -1,0 +1,81 @@
+{% extends 'home.html' %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+
+{% block content %}
+{% load static %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+  <div class="text-center" data-aos="fade-up" data-aos-delay="200">
+    <div class="sm:pt-8 lg:pt-4">
+      <h1 class="rounded-2xl bg-emerald-600 px-2 py-1 text-blue-800 uppercase text-4xl">
+        {{ title }}
+      </h1>
+    </div>
+
+    <div class="lg:p-6 rounded-3xl max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="300">
+      <form method="post" class="bg-white dark:bg-[#0b1121] shadow-lg rounded-lg p-6 space-y-6">
+        {% csrf_token %}
+
+        <!-- Paciente -->
+        <div>
+          <label for="id_paciente" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Paciente</label>
+          {{ form.paciente }}
+          {% if form.paciente.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.paciente.errors }}</p>
+          {% endif %}
+        </div>
+
+
+        <!-- Fecha -->
+        <div>
+          <label for="id_fecha" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Fecha</label>
+          {{ form.fecha }}
+          {% if form.fecha.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.fecha.errors }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Hora -->
+        <div>
+          <label for="id_hora" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hora</label>
+          {{ form.hora_cita }}
+          {% if form.hora_cita.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.hora.errors }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Estado -->
+        <div>
+          <label for="id_estado" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Estado</label>
+          {{ form.estado }}
+          {% if form.estado.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.estado.errors }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Observaciones -->
+        <div>
+          <label for="id_observaciones" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Observaciones</label>
+          {{ form.observaciones }}
+          {% if form.observaciones.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.observaciones.errors }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-center space-x-3">
+          <button type="submit"
+            class="bg-emerald-700 hover:bg-emerald-800 text-white py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all">
+            <i class="fa-solid fa-save mr-2"></i> Guardar Cita
+          </button>
+          <a href="{% url 'doctor:cita_list' %}"
+            class="bg-gray-600 hover:bg-gray-700 text-white py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all">
+            <i class="fa-solid fa-arrow-left mr-2"></i> Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
