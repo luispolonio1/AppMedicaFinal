@@ -1,5 +1,8 @@
 from django.urls import path
 from applications.core.views.paciente import paciente_find
+from applications.core.views.pacientes import PacienteCreateView, PacienteListView, PacienteUpdateView, PacienteDeleteView
+from applications.core.views.tipo_sangre import TipoSangreCreateView, TipoSangreListView, TipoSangreDeleteView
+from applications.core.views.Gastomensual import GastomensualListView, GastomensualCreateView, GastomensualUpdateView, GastomensualDeleteView
 from applications.core.views.TipoMedicamento import TipoMedicamentoCreateView
 from applications.core.views.MarcaMedicamento import MarcaMedicamentoCreateView
 from applications.core.views.Medicamentos import MedicamentoCreateView
@@ -12,13 +15,9 @@ from applications.core.views.diagnostico import (
 from applications.core.views.tipogasto import (
     TipoGastoListView, TipoGastoCreateView,
     TipoGastoUpdateView, TipoGastoDeleteView    )
-
-
 from applications.core.views.foto_paciente import (
     FotoPacienteListView, FotoPacienteCreateView,
     FotoPacienteUpdateView, FotoPacienteDeleteView) 
-
-
 from applications.core.views.cargo import (
     CargoListView, CargoCreateView,
     CargoUpdateView, CargoDeleteView)
@@ -79,6 +78,19 @@ urlpatterns = [
     path('doctor_create', DoctorCreateView.as_view(), name='doctor_create'),
     path('doctor_update/<int:pk>/', DoctorUpdateView.as_view(), name='doctor_update'),
     path('doctor_delete/<int:pk>/', DoctorDeleteView.as_view(), name='doctor_delete'),
+    path('paciente_list/', PacienteListView.as_view(), name='paciente_list'),
+    path('paciente_create/', PacienteCreateView.as_view(), name='paciente_create'),
+    path('paciente_update/<int:pk>/', PacienteUpdateView.as_view(), name='paciente_update'),
+    path('paciente_delete/<int:pk>/', PacienteDeleteView.as_view(), name='paciente_delete'),
 
+    
+    path('tipo_sangre_list/', TipoSangreListView.as_view(), name='tipo_sangre_list'),
+    path('tipo_sangre_create/',TipoSangreCreateView.as_view(), name='tipo_sangre_create'),
+    path('tipo_sangre_delete/<int:pk>/', TipoSangreDeleteView.as_view(), name='tipo_sangre_delete'),
+
+    # Rutas para vistas relacionadas con Gastos Mensuales
+    path('gastomensual_list/', GastomensualListView.as_view(), name='gastomensual_list'),
+    path('gastomensual_create/', GastomensualCreateView.as_view(), name='gastomensual_create'),
+    path('gastomensual_update/<int:pk>/', GastomensualUpdateView.as_view(), name='gastomensual_update'),
+    path('gastomensual_delete/<int:pk>/', GastomensualDeleteView.as_view(), name='gastomensual_delete'),    
 ]
-

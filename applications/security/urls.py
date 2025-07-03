@@ -1,4 +1,5 @@
 from django.urls import path
+from applications.security.views.permisos import PermissionDashboardView
 from applications.security.views.users import UserListView, UserCreateView, UserUpdateView, UserDeleteView
 from applications.security.views.auth import signin, signout
 from applications.security.views.menu import MenuCreateView, MenuDeleteView, MenuListView, MenuUpdateView
@@ -6,17 +7,20 @@ from applications.security.views.module import ModuleCreateView, ModuleDeleteVie
 from applications.security.views.grupos import GroupListView, GroupCreateView, GroupUpdateView, GroupDeleteView
 from applications.security.views.gruposmodulospermisos import GroupModulePermissionListView, GroupModulePermissionCreateView, GroupModulePermissionUpdateView, GroupModulePermissionDeleteView
 from applications.security.views.grupos import GroupListView, GroupCreateView, GroupUpdateView, GroupDeleteView
-
-
+from applications.security.views.permisos import get_permissions, get_all_permissions
 
 app_name='security' # define un espacio de nombre para la aplicacion
 urlpatterns = [
 
+  path('permisos/', PermissionDashboardView.as_view(), name='permission_dashboard'),
   # rutas de modulos
   path('module_list/',ModuleListView.as_view() ,name="module_list"),
   path('module_create/', ModuleCreateView.as_view(),name="module_create"),
   path('module_update/<int:pk>/', ModuleUpdateView.as_view(),name='module_update'),
   path('module_delete/<int:pk>/', ModuleDeleteView.as_view(),name='module_delete'),
+
+  path('get-permissions/<int:pk>/', get_permissions, name='get_permissions'),
+    path('get-all-permissions/', get_all_permissions, name='get_all_permissions'),
 
 # rutas de gruposmodulospermisos
   path('group_module_permission_list/', GroupModulePermissionListView.as_view(), name='group_module_permission_list'),
@@ -46,4 +50,6 @@ urlpatterns = [
   path('users_create/', UserCreateView.as_view(), name='user_create'),
   path('users_update/<int:pk>/', UserUpdateView.as_view(), name='user_update'),
   path('users_delete/<int:pk>/', UserDeleteView.as_view(), name='user_delete'),
+
+  path('get_permissions/<int:pk>', get_permissions, name="get_permissions"),
 ]
