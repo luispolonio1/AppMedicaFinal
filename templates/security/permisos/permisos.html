@@ -1,0 +1,26 @@
+{% extends 'home.html' %}
+{% block title %}Permisos{% endblock %}
+{% block content %}
+<div class="grid md:grid-cols-3 gap-6 mt-6 px-4">
+    <a href="{% url 'security:group_module_permission_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-semibold text-indigo-600">Grupo-Módulo-Permiso</h2>
+        <p class="text-gray-500">Gestiona los permisos por grupo</p>
+    </a>
+    <a href="{% url 'security:module_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-semibold text-blue-600">Módulos</h2>
+        <p class="text-gray-500">Administra los módulos del sistema</p>
+    </a>
+    <a href="{% url 'security:menu_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-semibold text-purple-600">Menús</h2>
+        <p class="text-gray-500">Configura los menús</p>
+    </a>
+    <a href="{% url 'security:grupos_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-semibold text-green-600">Grupos</h2>
+        <p class="text-gray-500">Gestiona los grupos de usuarios</p>
+    </a>
+    <a href="{% url 'security:user_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
+        <h2 class="text-xl font-semibold text-pink-600">Usuarios</h2>
+        <p class="text-gray-500">Administración de usuarios</p>
+    </a>
+</div>
+{% endblock %}
