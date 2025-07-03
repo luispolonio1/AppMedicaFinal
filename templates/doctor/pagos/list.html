@@ -1,0 +1,96 @@
+{% extends 'home.html' %}
+{% load static %}
+<title>{% block title %}Pagos{% endblock %}</title>
+
+{% block content %}
+{% include 'fragments/messages.html' %}
+
+<section class="dark:bg-principal mt-2">
+  <div class="text-center">
+    <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
+      Pagos
+    </h1>
+
+    <!-- Búsqueda -->
+    <div class="p-4 flex justify-center">
+      <form method="get" class="relative mt-1">
+        <i class="fa-solid fa-magnifying-glass absolute inset-y-0 start-0 ps-3 pt-3 text-gray-500"></i>
+        <input name="q" value="{{ request.GET.q }}" placeholder="Buscar por ID, pagador o referencia"
+               class="pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
+                      focus:ring-blue-500 focus:border-blue-500 block p-2.5 pr-12
+                      dark:bg-principal dark:border-gray-600 dark:text-gray-400">
+      </form>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-center text-lg">
+        <thead class="uppercase font-Tiny5 bg-gray-50 dark:bg-secundario dark:text-blue-300">
+          <tr>
+            <th class="px-6 py-3">ID</th>
+            <th class="px-6 py-3">Atención</th>
+            <th class="px-6 py-3">Monto</th>
+            <th class="px-6 py-3">Estado</th>
+            <th class="px-6 py-3">Fecha Pago</th>
+            <th class="px-6 py-3">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pagos %}
+          <tr class="dark:text-gray-400 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-gray-50 dark:hover:bg-[#121c33]">
+            <td class="px-6 py-4">{{ p.id }}</td>
+            <td class="px-6 py-4">{{ p.atencion|default:"—" }}</td>
+            <td class="px-6 py-4">{{ p.monto_total }}</td>
+            <td class="px-6 py-4">{{ p.estado }}</td>
+            <td class="px-6 py-4">{{ p.fecha_pago|date:"d/m/Y H:i" }}</td>
+            <td class="px-6 py-4">
+              <a href="{% url 'doctor:pago_update' p.id %}" class="text-blue-600 mx-1">
+                <i class="fa-solid fa-edit text-lg"></i>
+              </a>
+              <a href="#" class="text-red-600 mx-1"
+                 onclick="openDeleteModal('{{ p.id }}', 'Pago ID: {{ p.id }}')">
+                <i class="fa-solid fa-trash text-lg"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="px-6 py-4">Sin pagos registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    {% include 'fragments/pagination.html' with page_obj=page_obj %}
+
+    <!-- Acciones inferiores -->
+    <div class="flex flex-col md:flex-row justify-center p-4">
+      <a href="{{ create_url }}"
+         class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full mr-0 md:mr-2 mb-2 md:mb-0">
+        <i class="fa-solid fa-plus mr-2"></i> Nuevo Pago
+      </a>
+      <a href="{% url 'home' %}"
+         class="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-full">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Modal de eliminación -->
+{% include 'fragments/delete.html' %}
+
+<script>
+function openDeleteModal(id, texto) {
+  const deleteForm = document.getElementById('deleteForm');
+  deleteForm.action = "{% url 'doctor:pago_delete' 0 %}".replace('0', id);
+  document.getElementById('Description').textContent = texto;
+  document.getElementById('deleteModal').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('deleteModal').classList.add('hidden');
+}
+</script>
+{% endblock %}

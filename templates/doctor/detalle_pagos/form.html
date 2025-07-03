@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl mb-4">{{ grabar }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {% for field in form %}
+    <div class="mb-4">
+      <label class="block font-medium text-gray-700">{{ field.label_tag }}</label>
+      {{ field }}
+      {% if field.help_text %}
+        <small class="text-gray-500">{{ field.help_text }}</small>
+      {% endif %}
+      {{ field.errors }}
+    </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary">{{ grabar }}</button>
+  <a href="{{ back_url }}" class="btn btn-secondary ml-2">Cancelar</a>
+</form>
+{% endblock %}
