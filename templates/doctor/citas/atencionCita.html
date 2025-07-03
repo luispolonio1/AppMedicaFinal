@@ -163,9 +163,9 @@
                         </div>
                     </div>
 
-                    <form method="post" id="atencionForm">
+                   <form method="post" id="atencionForm" action="{% url 'doctor:atender_paciente' pk=cita.pk %}">
                         {% csrf_token %}
-
+                        <input type="hidden" name="cita_id" value="{{ cita.id }}">
                         <div class="form-section">
                                 <h4 class="section-title">
                                     <i class="fas fa-heartbeat"></i>
@@ -345,7 +345,10 @@
                                               placeholder="Liste los exámenes de laboratorio, imagenología u otros estudios solicitados..."></textarea>
                                 </div>
                             </div>
+                            
+                            <!-- Medicamentos Recetados y detalles -->
 
+                            
                             <!-- Comentarios Adicionales -->
                             <div class="form-section">
                                 <h4 class="section-title">
