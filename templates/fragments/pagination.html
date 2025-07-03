@@ -1,0 +1,44 @@
+{% comment %} Reutilizable: espera recibir page_obj en el contexto {% endcomment %}
+{% if page_obj %}
+<div class="flex justify-center mt-4">
+  <nav aria-label="pagination">
+    <ul class="inline-flex -space-x-px">
+
+      {% if page_obj.has_previous %}
+      <li>
+        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 h-8 flex items-center justify-center bg-white border border-gray-300 rounded-s-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33]">
+          « Primera
+        </a>
+      </li>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+      <li>
+        <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 h-8 flex items-center justify-center border border-gray-300
+                  {% if num == page_obj.number %}
+                    text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700
+                    dark:bg-secundario dark:border-principal dark:text-blue-300
+                  {% else %}
+                    text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700
+                    dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white
+                  {% endif %}">
+          {{ num }}
+        </a>
+      </li>
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+      <li>
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 h-8 flex items-center justify-center bg-white border border-gray-300 rounded-e-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33]">
+          Siguiente »
+        </a>
+      </li>
+      {% endif %}
+
+    </ul>
+  </nav>
+</div>
+{% endif %}
