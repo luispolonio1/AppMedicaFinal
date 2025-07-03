@@ -1,0 +1,536 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="form-container">
+    <div class="form-header">
+      <div class="header-content">
+        <div class="header-title">
+          <div class="icon-wrapper">
+            <i class="fas fa-clipboard-list"></i>
+          </div>
+          <h4>
+            {% if form.instance.pk %}
+              Editar Detalle de Atención
+            {% else %}
+              Nuevo Detalle de Atención
+            {% endif %}
+          </h4>
+        </div>
+        <a href="home" class="btn-back">
+          <i class="fas fa-arrow-left"></i>
+          <span>Volver</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="form-body">
+      <form method="post" novalidate class="modern-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+          <div class="alert-error">
+            <div class="alert-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="alert-content">
+              {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        
+        <div class="form-grid">
+          {% for field in form %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}" class="form-label">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="required-indicator">*</span>
+                {% endif %}
+              </label>
+              
+              <div class="input-wrapper">
+                {% if field.field.widget.input_type == 'select' %}
+                  <select class="form-input select-input {% if field.errors %}error{% endif %}" 
+                          id="{{ field.id_for_label }}" 
+                          name="{{ field.name }}"
+                          {% if field.field.required %}required{% endif %}>
+                    {% for value, label in field.field.choices %}
+                      <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="select-arrow">
+                    <i class="fas fa-chevron-down"></i>
+                  </div>
+                {% else %}
+                  <input type="{{ field.field.widget.input_type }}" 
+                         class="form-input {% if field.errors %}error{% endif %}" 
+                         id="{{ field.id_for_label }}" 
+                         name="{{ field.name }}" 
+                         value="{{ field.value|default_if_none:'' }}"
+                         {% if field.field.required %}required{% endif %}
+                         placeholder="Ingrese {{ field.label|lower }}">
+                {% endif %}
+              </div>
+              
+              {% if field.help_text %}
+                <div class="help-text">
+                  <i class="fas fa-info-circle"></i>
+                  <span>{{ field.help_text }}</span>
+                </div>
+              {% endif %}
+              
+              {% for error in field.errors %}
+                <div class="error-message">
+                  <i class="fas fa-exclamation-circle"></i>
+                  <span>{{ error }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+        
+        <div class="form-actions">
+          <button type="reset" class="btn btn-secondary">
+            <i class="fas fa-undo"></i>
+            <span>Limpiar</span>
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            <span>
+              {% if form.instance.pk %}
+                Actualizar
+              {% else %}
+                Guardar
+              {% endif %}
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="form-footer">
+      <div class="footer-info">
+        <i class="fas fa-info-circle"></i>
+        <span>Los campos marcados con <span class="required-indicator">*</span> son obligatorios.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #6b7280;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
+    --background: #f8fafc;
+    --card-background: #ffffff;
+    --border-color: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .form-container {
+    background: var(--card-background);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .form-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: white;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .form-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,0 1000,0 1000,100 0,80"/></svg>');
+    background-size: cover;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .icon-wrapper i {
+    font-size: 1.25rem;
+  }
+
+  .header-title h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-back:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .form-body {
+    padding: 2.5rem;
+  }
+
+  .alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fef2f2 0%, #fce8e6 100%);
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .alert-icon {
+    width: 2rem;
+    height: 2rem;
+    background: var(--error-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .alert-content p {
+    margin: 0;
+    color: #991b1b;
+    font-weight: 500;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .required-indicator {
+    color: var(--error-color);
+    font-weight: bold;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: var(--text-primary);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .form-input.error {
+    border-color: var(--error-color);
+    background: #fef2f2;
+  }
+
+  .form-input.error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  .select-input {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 3rem;
+  }
+
+  .select-arrow {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+  }
+
+  .select-input:focus + .select-arrow {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  .help-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .help-text i {
+    color: var(--primary-color);
+  }
+
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--error-color);
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn:hover::before {
+    left: 100%;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+    color: white;
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+  }
+
+  .btn-secondary:hover {
+    background: var(--background);
+    border-color: var(--text-secondary);
+    transform: translateY(-1px);
+  }
+
+  .form-footer {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 1.5rem 2.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .footer-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .footer-info i {
+    color: var(--primary-color);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .container {
+      padding: 1rem;
+    }
+
+    .form-header {
+      padding: 1.5rem;
+    }
+
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .form-body {
+      padding: 1.5rem;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column-reverse;
+    }
+
+    .btn {
+      justify-content: center;
+    }
+
+    .form-footer {
+      padding: 1rem 1.5rem;
+    }
+  }
+
+  /* Animation for form elements */
+  .form-group {
+    animation: slideInUp 0.5s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .form-group:nth-child(1) { animation-delay: 0.1s; }
+  .form-group:nth-child(2) { animation-delay: 0.2s; }
+  .form-group:nth-child(3) { animation-delay: 0.3s; }
+  .form-group:nth-child(4) { animation-delay: 0.4s; }
+  .form-group:nth-child(5) { animation-delay: 0.5s; }
+  .form-group:nth-child(6) { animation-delay: 0.6s; }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-container {
+    animation: fadeInScale 0.6s ease-out;
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
+{% endblock %}

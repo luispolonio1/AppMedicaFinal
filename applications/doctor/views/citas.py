@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils import timezone
 from applications.doctor.forms.citas import CitaMedicaForm
-from applications.core.models import Paciente, Medicamento, Diagnostico
+from applications.core.models import Paciente,Doctor
 from applications.doctor.models import CitaMedica
 from applications.security.components.mixin_crud import CreateViewMixin, DeleteViewMixin, ListViewMixin, \
     PermissionMixin, UpdateViewMixin
@@ -61,6 +61,7 @@ class CitaMedicaCreateView(PermissionMixin, CreateViewMixin, CreateView):
         context['title'] = 'Crear Cita Médica'
         context['form'] = self.get_form()
         context['pacientes'] = Paciente.objects.all()
+        context['doctores']=Doctor.objects.all()
         return context
 
 class CitaMedicaUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
