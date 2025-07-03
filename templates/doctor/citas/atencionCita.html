@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atención Médica - {{ cita.paciente.nombre_completo }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header-section {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .patient-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+        .section-title {
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+        .section-title i {
+            margin-right: 10px;
+            color: #667eea;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .vital-signs {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .btn-custom {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-success-custom {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+        }
+        .btn-secondary-custom {
+            background: linear-gradient(45deg, #6c757d, #5a6268);
+            color: white;
+        }
+        .input-group-text {
+            background-color: #667eea;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        .textarea-large {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .imc-display {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .floating-save {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .floating-save {
+                position: relative;
+                bottom: auto;
+                right: auto;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="main-container">
+                <!-- Header -->
+                <div class="header-section">
+                    <h1><i class="fas fa-stethoscope me-3"></i>Atención Médica</h1>
+                    <p class="mb-0">Registro completo de consulta médica</p>
+                </div>
+
+                <div class="p-4">
+                    <!-- Información del Paciente -->
+                    <div class="patient-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5><i class="fas fa-user me-2"></i>{{ cita.paciente.nombre_completo }}</h5>
+                                <p class="mb-1"><strong>Fecha de Cita:</strong> {{ cita.fecha|date:"d/m/Y" }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Hora:</strong> {{ cita.hora_cita|time:"H:i" }}</p>
+                                <p class="mb-1"><strong>ID Paciente:</strong> #{{ cita.paciente.id }}</p>
+                                <p class="mb-0"><strong>Estado:</strong> {{ cita.estado }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                   <form method="post" id="atencionForm" action="{% url 'doctor:atender_paciente' pk=cita.pk %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="cita_id" value="{{ cita.id }}">
+                        <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-heartbeat"></i>
+                                    Signos Vitales
+                                </h4>
+                                <div class="vital-signs">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Presión Arterial</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-tachometer-alt"></i></span>
+                                                    <input type="text" class="form-control" name="presion_arterial" 
+                                                           placeholder="120/80" pattern="[0-9]+/[0-9]+" 
+                                                           title="Formato: 120/80">
+                                                </div>
+                                                <small class="text-muted">Ejemplo: 120/80 mmHg</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Pulso (ppm)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-heartbeat"></i></span>
+                                                    <input type="number" class="form-control" name="pulso" 
+                                                           min="40" max="200" placeholder="72">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Temperatura (°C)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-thermometer-half"></i></span>
+                                                    <input type="number" class="form-control" name="temperatura" 
+                                                           step="0.1" min="35" max="42" placeholder="36.5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Frecuencia Respiratoria (rpm)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-lungs"></i></span>
+                                                    <input type="number" class="form-control" name="frecuencia_respiratoria" 
+                                                           min="10" max="60" placeholder="16">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Saturación O2 (%)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-percentage"></i></span>
+                                                    <input type="number" class="form-control" name="saturacion_oxigeno" 
+                                                           step="0.01" min="70" max="100" placeholder="98">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Peso (kg)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-weight"></i></span>
+                                                    <input type="number" class="form-control" name="peso" id="peso"
+                                                           step="0.01" min="1" max="300" placeholder="70.5" 
+                                                           oninput="calcularIMC()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">Altura (m)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="fas fa-ruler-vertical"></i></span>
+                                                    <input type="number" class="form-control" name="altura" id="altura"
+                                                           step="0.01" min="0.5" max="2.5" placeholder="1.75"
+                                                           oninput="calcularIMC()">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">IMC Calculado</label>
+                                                <div id="imcDisplay" class="imc-display" style="display: none;">
+                                                    <span id="imcValue">0</span> - <span id="imcCategory">Normal</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Motivo y Síntomas -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    Motivo de Consulta y Síntomas
+                                </h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Motivo de Consulta *</label>
+                                            <textarea class="form-control textarea-large" name="motivo_consulta" 
+                                                      placeholder="Describa el motivo principal de la consulta..." 
+                                                      required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Síntomas Presentados *</label>
+                                            <textarea class="form-control textarea-large" name="sintomas" 
+                                                      placeholder="Detalle los síntomas que presenta el paciente..." 
+                                                      required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Examen Físico -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-search"></i>
+                                    Examen Físico
+                                </h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Hallazgos del Examen Físico</label>
+                                    <textarea class="form-control textarea-large" name="examen_fisico" 
+                                              placeholder="Describa los hallazgos del examen físico realizado..."></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Diagnósticos -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-diagnoses"></i>
+                                    Diagnósticos
+                                </h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Diagnósticos Clínicos</label>
+                                    <select class="form-select" name="diagnostico" multiple>
+                                        {% for diagnostico in diagnosticos %}
+                                        <option value="{{ diagnostico.id }}">{{ diagnostico.descripcion }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <small class="text-muted">Mantenga presionado Ctrl para seleccionar múltiples diagnósticos</small>
+                                </div>
+                            </div>
+
+                            <!-- Tratamiento -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-pills"></i>
+                                    Plan de Tratamiento
+                                </h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Tratamiento e Indicaciones *</label>
+                                    <textarea class="form-control textarea-large" name="tratamiento" 
+                                              placeholder="Detalle el plan de tratamiento, medicamentos, dosis, frecuencia..." 
+                                              required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Exámenes Solicitados -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-flask"></i>
+                                    Exámenes y Estudios
+                                </h4>
+                                <div class="mb-3">
+                                    <label class="form-label">Exámenes Solicitados</label>
+                                    <textarea class="form-control textarea-large" name="examenes_enviados" 
+                                              placeholder="Liste los exámenes de laboratorio, imagenología u otros estudios solicitados..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Medicamentos Recetados y detalles -->
+
+                            
+                            <!-- Comentarios Adicionales -->
+                            <div class="form-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-comment-medical"></i>
+                                    Observaciones Adicionales
+                                </h4>
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label">Comentarios Adicionales</label>
+                                            <textarea class="form-control textarea-large" name="comentario_adicional" 
+                                                      placeholder="Observaciones adicionales, recomendaciones especiales..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="es_control" 
+                                                       id="esControl" style="transform: scale(1.5);">
+                                                <label class="form-check-label" for="esControl">
+                                                    <strong>¿Es consulta de control?</strong>
+                                                    <br><small class="text-muted">Marque si es seguimiento</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="text-center mt-4">
+                            <button type="button" onclick="history.back()" class="btn btn-secondary-custom btn-custom me-3">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-success-custom btn-custom">
+                                <i class="fas fa-save me-2"></i>Guardar Atención
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botón Flotante de Guardado Rápido -->
+<div class="floating-save d-none d-lg-block">
+    <button type="submit" form="atencionForm" class="btn btn-success-custom btn-custom">
+        <i class="fas fa-save me-2"></i>Guardar
+    </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Calcular IMC automáticamente
+    function calcularIMC() {
+        const peso = parseFloat(document.getElementById('peso').value);
+        const altura = parseFloat(document.getElementById('altura').value);
+        if (peso && altura && altura > 0) {
+            const imc = peso / (altura * altura);
+            const imcRedondeado = Math.round(imc * 100) / 100;
+            let categoria = '';
+            let color = '';
+            if (imc < 18.5) {
+                categoria = 'Bajo peso';
+                color = '#3498db';
+            } else if (imc < 25) {
+                categoria = 'Normal';
+                color = '#4caf50';
+            } else if (imc < 30) {
+                categoria = 'Sobrepeso';
+                color = '#ff9800';
+            } else {
+                categoria = 'Obesidad';
+                color = '#f44336';
+            }
+            const imcDisplay = document.getElementById('imcDisplay');
+            const imcValue = document.getElementById('imcValue');
+            const imcCategory = document.getElementById('imcCategory');
+            imcValue.textContent = imcRedondeado;
+            imcCategory.textContent = categoria;
+            imcDisplay.style.background = `linear-gradient(45deg, ${color}, ${color}dd)`;
+            imcDisplay.style.display = 'block';
+        } else {
+            document.getElementById('imcDisplay').style.display = 'none';
+        }
+    }
+    // Validación del formulario
+    document.getElementById('atencionForm').addEventListener('submit', function(e) {
+        const requiredFields = ['motivo_consulta', 'sintomas', 'tratamiento'];
+        let isValid = true;
+        requiredFields.forEach(field => {
+            const input = document.querySelector(`[name="${field}"]`);
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos obligatorios marcados con *');
+        }
+    });
+</script>
+</body>
+</html>

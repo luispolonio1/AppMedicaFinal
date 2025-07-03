@@ -14,7 +14,7 @@
             <div class="lg:p-2 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
                 <!-- Search Bar -->
                 <div class="p-4 flex justify-center">
-                    <label for="table-search" class="sr-only">Buscar Atenciones</label>
+                    <label for="table-search" class="sr-only">Buscar Citas</label>
                     <div class="relative mt-1">
                         <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
@@ -40,27 +40,29 @@
                                 <th scope="col" class="px-4 py-4">ID</th>
                                 <th scope="col" class="px-4 py-4">Paciente</th>
                                 <th scope="col" class="px-4 py-4">Fecha de Atención</th>
-                                <th scope="col" class="px-4 py-4">Motivo de Consulta</th>
-                                <th scope="col" class="px-4 py-4">Síntomas</th>
-                                <th scope="col" class="px-4 py-4">Diagnósticos</th>
-                                <th scope="col" class="px-4 py-4">Tratamiento</th>
+                                <th scope="col" class="px-4 py-4">Hora de cita</th>
+                                <th scope="col" class="px-4 py-4">Estado</th>
                                 <th scope="col" class="px-4 py-4">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for atencion in atenciones %}
+                            {% for cita in citas %}
                             <tr class="dark:text-gray-300 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-emerald-50 dark:hover:bg-[#121c33] transition-colors duration-200">
                                 <td class="px-4 py-4 font-medium text-emerald-600 dark:text-emerald-400">
-                                    #{{ atencion.id }}
+                                    #{{ cita.id }}
                                 </td>
 
                                 <td class="px-4 py-4">
                                     <div class="flex flex-col">
                                         <span class="font-semibold text-gray-900 dark:text-gray-100">
-                                            {{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}
+                                            {{ cita.paciente.nombres }}
                                         </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex flex-col">
                                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ atencion.paciente.numero_identificacion }}
+                                            {{cita.fecha}}
                                         </span>
                                     </div>
                                 </td>
@@ -68,66 +70,22 @@
                                 <td class="px-4 py-4">
                                     <div class="flex flex-col">
                                         <span class="font-medium text-gray-900 dark:text-gray-100">
-                                            {{ atencion.fecha_atencion|date:"d/m/Y" }}
+                                            {{cita.hora_cita }}
                                         </span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4">
+                                    <div class="flex flex-col">
                                         <span class="text-xs text-gray-500 dark:text-gray-400">
-                                            {{ atencion.fecha_atencion|time:"H:i" }}
+                                            {{cita.estado|capfirst }}
                                         </span>
-                                    </div>
-                                </td>
-
-                                <td class="px-4 py-4">
-                                    <div class="max-w-xs">
-                                        {% if atencion.motivo_consulta %}
-                                            <p class="text-sm text-gray-700 dark:text-gray-300 text-left">
-                                                {{ atencion.motivo_consulta|truncatechars:80 }}
-                                            </p>
-                                        {% else %}
-                                            <span class="text-gray-400 italic text-xs">Sin especificar</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-
-                                <td class="px-4 py-4">
-                                    <div class="max-w-xs">
-                                        {% if atencion.sintomas %}
-                                            <p class="text-sm text-gray-700 dark:text-gray-300 text-left">
-                                                {{ atencion.sintomas|truncatechars:60 }}
-                                            </p>
-                                        {% else %}
-                                            <span class="text-gray-400 italic text-xs">Sin registrar</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-
-                                <td class="px-4 py-4">
-                                    <div class="flex flex-wrap gap-1 justify-center">
-                                        {% for diagnostico in atencion.diagnostico.all %}
-                                            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
-                                                {{ diagnostico.codigo }}
-                                            </span>
-                                        {% empty %}
-                                            <span class="text-gray-400 italic text-xs">Sin diagnóstico</span>
-                                        {% endfor %}
-                                    </div>
-                                </td>
-
-                                <td class="px-4 py-4">
-                                    <div class="max-w-xs">
-                                        {% if atencion.tratamiento %}
-                                            <p class="text-sm text-gray-700 dark:text-gray-300 text-left">
-                                                {{ atencion.tratamiento|truncatechars:60 }}
-                                            </p>
-                                        {% else %}
-                                            <span class="text-gray-400 italic text-xs">Sin tratamiento</span>
-                                        {% endif %}
                                     </div>
                                 </td>
 
                                 <td class="px-4 py-4">
                                     <div class="flex justify-center space-x-2">
                                         {% if permissions.view_atencion %}
-                                        <a href="{% url 'doctor:detalleatencion_detail' atencion.id %}"
+                                        <a href="{% url 'doctor:cita_detail' cita.id %}"
                                             class="text-emerald-600 dark:text-emerald-500 hover:text-emerald-800 p-1 rounded transition-colors"
                                             title="Ver Detalle">
                                             <i class="fa-solid fa-eye text-lg"></i>
@@ -135,7 +93,7 @@
                                         {% endif %}
 
                                         {% if permissions.change_atencion %}
-                                        <a href="{% url 'doctor:atencion_update' atencion.id %}"
+                                        <a href="{% url 'doctor:cita_update' cita.id %}"
                                             class="text-blue-600 dark:text-blue-500 hover:text-blue-800 p-1 rounded transition-colors"
                                             title="Editar">
                                             <i class="fa-solid fa-edit text-lg"></i>
@@ -145,7 +103,7 @@
                                         {% if permissions.delete_atencion %}
                                         <a href="#"
                                             class="text-red-600 dark:text-red-500 hover:text-red-800 p-1 rounded transition-colors"
-                                            onclick="openDeleteModal('{{ atencion.id }}', '{{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}')"
+                                            onclick="openDeleteModal('{{ cita.id }}')"
                                             title="Eliminar">
                                             <i class="fa-solid fa-trash text-lg"></i>
                                         </a>
@@ -208,13 +166,13 @@
                 <div class="flex flex-col md:flex-row justify-center items-center gap-3 p-6">
                     {% if permissions.add_atencion %}
                     <a class="bg-emerald-700 hover:bg-emerald-800 text-black py-3 px-6 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                        href="{% url 'doctor:atencion_create' %}">
-                        <i class="fa-solid fa-plus mr-2"></i> Nueva Atención Médica
+                        href="{% url 'doctor:cita_create' %}">
+                        <i class="fa-solid fa-plus mr-2"></i> Nueva Cita
                     </a>
                     {% endif %}
 
                     <a class="bg-gray-600 hover:bg-gray-700 text-black py-3 px-6 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                        href="{% url 'doctor:atencion_list' %}">
+                        href="{% url 'doctor:cita_list' %}">
                         <i class="fa-solid fa-users mr-2"></i> Ver Pacientes
                     </a>
 
@@ -262,7 +220,7 @@
     <script>
     function openDeleteModal(id, patientName) {
         const deleteForm = document.getElementById('deleteForm');
-        deleteForm.action = `{% url 'doctor:atencion_delete' 0 %}`.replace('0', id);
+        deleteForm.action = `{% url 'doctor:cita_delete' 0 %}`.replace('0', id);
         document.getElementById('Description').textContent = `Atención médica #${id} - Paciente: `;
         document.getElementById('deleteModal').classList.remove('hidden');
     }

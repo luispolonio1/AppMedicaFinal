@@ -1,0 +1,399 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Empleado{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/20 rounded-full p-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white">Crear Nuevo Empleado</h1>
+                </div>
+            </div>
+
+<style>
+/* Estilos para los campos del formulario */
+input[type="text"], 
+input[type="email"], 
+input[type="number"], 
+input[type="date"], 
+input[type="datetime-local"],
+input[type="tel"],
+textarea,
+select {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    background-color: #ffffff !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Hover states */
+input[type="text"]:hover, 
+input[type="email"]:hover, 
+input[type="number"]:hover, 
+input[type="date"]:hover, 
+input[type="datetime-local"]:hover,
+input[type="tel"]:hover,
+textarea:hover,
+select:hover {
+    border-color: #9ca3af !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Focus states para campos de información personal (azul) */
+#id_nombres:focus, 
+#id_apellidos:focus, 
+#id_cedula_ecuatoriana:focus, 
+#id_dni:focus, 
+#id_fecha_nacimiento:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Focus states para campos laborales (verde) */
+#id_cargo:focus, 
+#id_fecha_ingreso:focus, 
+#id_direccion:focus, 
+#id_latitud:focus, 
+#id_longitud:focus {
+    outline: none !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Campo sueldo con padding especial para el símbolo $ */
+#id_sueldo {
+    padding-left: 32px !important;
+    border-color: #10b981 !important;
+}
+
+#id_sueldo:focus {
+    outline: none !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: #10b981 !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 4px !important;
+}
+
+input[type="checkbox"]:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* File input styling */
+input[type="file"] {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px dashed #d1d5db !important;
+    border-radius: 8px !important;
+    background-color: #f9fafb !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+input[type="file"]:hover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+}
+
+input[type="file"]:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* File input button styling */
+input[type="file"]::file-selector-button {
+    margin-right: 12px !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 20px !important;
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: #dbeafe !important;
+}
+
+/* Textarea specific styling */
+textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+}
+
+/* Select styling */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 12px center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px 16px !important;
+    padding-right: 40px !important;
+    appearance: none !important;
+}
+
+/* Placeholder styling */
+input::placeholder,
+textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+/* Disabled state */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    background-color: #f3f4f6 !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+}
+
+/* Error state */
+.errorlist {
+    color: #dc2626 !important;
+    font-size: 12px !important;
+    margin-top: 4px !important;
+}
+
+input.error,
+textarea.error,
+select.error {
+    border-color: #dc2626 !important;
+}
+
+input.error:focus,
+textarea.error:focus,
+select.error:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+</style>
+            <div class="p-8">
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Error Messages -->
+                    {% if form.errors %}
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                </svg>
+                                <h3 class="text-sm font-medium text-red-800">Por favor corrige los siguientes errores:</h3>
+                            </div>
+                            <ul class="mt-2 text-sm text-red-700 space-y-1">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li class="flex items-start">
+                                            <span class="font-medium">{{ field.label }}:</span>
+                                            <span class="ml-1">{{ error }}</span>
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Información Personal -->
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-3 pb-3 border-b border-blue-100">
+                                <div class="bg-blue-100 rounded-full p-2">
+                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-xl font-semibold text-blue-700">Información Personal</h2>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="group">
+                                    <label for="{{ form.nombres.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.nombres.label }}
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.nombres }}
+                                    </div>
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.apellidos.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.apellidos.label }}
+                                    </label>
+                                    {{ form.apellidos }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.cedula_ecuatoriana.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.cedula_ecuatoriana.label }}
+                                    </label>
+                                    {{ form.cedula_ecuatoriana }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.dni.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.dni.label }}
+                                    </label>
+                                    {{ form.dni }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.fecha_nacimiento.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.fecha_nacimiento.label }}
+                                    </label>
+                                    {{ form.fecha_nacimiento }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.foto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.foto.label }}
+                                    </label>
+                                    <div class="relative">
+                                        {{ form.foto }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Información Laboral -->
+                        <div class="space-y-6">
+                            <div class="flex items-center space-x-3 pb-3 border-b border-green-100">
+                                <div class="bg-green-100 rounded-full p-2">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6"></path>
+                                    </svg>
+                                </div>
+                                <h2 class="text-xl font-semibold text-green-700">Información Laboral</h2>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="group">
+                                    <label for="{{ form.cargo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.cargo.label }}
+                                    </label>
+                                    {{ form.cargo }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.sueldo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.sueldo.label }}
+                                    </label>
+                                    <div class="relative">
+                                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">$</span>
+                                        {{ form.sueldo }}
+                                    </div>
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.fecha_ingreso.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.fecha_ingreso.label }}
+                                    </label>
+                                    {{ form.fecha_ingreso }}
+                                </div>
+                                
+                                <div class="group">
+                                    <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                        {{ form.direccion.label }}
+                                    </label>
+                                    {{ form.direccion }}
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="group">
+                                        <label for="{{ form.latitud.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                            {{ form.latitud.label }}
+                                        </label>
+                                        {{ form.latitud }}
+                                    </div>
+                                    <div class="group">
+                                        <label for="{{ form.longitud.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                                            {{ form.longitud.label }}
+                                        </label>
+                                        {{ form.longitud }}
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <div class="flex items-center space-x-3">
+                                        {{ form.activo }}
+                                        <label for="{{ form.activo.id_for_label }}" class="text-sm font-medium text-green-800">
+                                            {{ form.activo.label }}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0 pt-6 border-t border-gray-200">
+                        <a href="{% url 'core:empleado_list' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Volver
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-8 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                            </svg>
+                            Guardar Empleado
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-marcar activo por defecto
+    const activoCheckbox = document.getElementById('{{ form.activo.id_for_label }}');
+    if (activoCheckbox && !activoCheckbox.checked) {
+        activoCheckbox.checked = true;
+    }
+    
+    // Validación de cédula ecuatoriana
+    const cedulaInput = document.getElementById('{{ form.cedula_ecuatoriana.id_for_label }}');
+    if (cedulaInput) {
+        cedulaInput.addEventListener('input', function() {
+            const cedula = this.value.replace(/\D/g, '');
+            if (cedula.length > 10) {
+                this.value = cedula.slice(0, 10);
+            }
+        });
+    }
+    
+    // Animación suave al hacer scroll
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+});
+</script>
+{% endblock %}

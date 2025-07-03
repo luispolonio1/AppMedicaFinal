@@ -201,6 +201,7 @@ class Paciente(models.Model):
 """Modelo que representa las diferentes especialidades médicas.
 Cada doctor puede tener una o varias especialidades.
 """
+#HECHO
 class Especialidad(models.Model):
     # Nombre de la especialidad médica (ej. Cardiología, Pediatría, etc.)
     nombre = models.CharField(
@@ -430,7 +431,7 @@ class Empleado(models.Model):
         ordering = ['apellidos', 'nombres']
         verbose_name = "Empleado"
         verbose_name_plural = "Empleados"
-
+#HECHO
 class TipoMedicamento(models.Model):
     # Nombre del tipo de medicamento (ej. Analgésico, Antibiótico, etc.)
     nombre = models.CharField(
@@ -455,7 +456,7 @@ class TipoMedicamento(models.Model):
         verbose_name_plural = "Tipos de Medicamentos"
         ordering = ['nombre']
 
-
+#HECHO
 class MarcaMedicamento(models.Model):
     # Nombre de la marca (ej. Pfizer, Bayer, Novartis)
     nombre = models.CharField(
@@ -485,7 +486,7 @@ class ActiveMedicationManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(activo=True)
 
-
+#HECHO
 class Medicamento(models.Model):
     tipo = models.ForeignKey(
         TipoMedicamento,
@@ -557,7 +558,7 @@ class Medicamento(models.Model):
         ordering = ['nombre']
         verbose_name = "Medicamento"
         verbose_name_plural = "Medicamentos"
-
+#HECHO
 # Modelo que representa los diagnósticos médicos.
 # Incluye un código único, descripción y un campo adicional para información relevante.
 class Diagnostico(models.Model):
@@ -631,6 +632,9 @@ class TipoGasto(models.Model):
         verbose_name_plural = "Tipos de Gastos"
 
 
+
+
+#hacerlo PENDIENTE
 class GastoMensual(models.Model):
     """
     Modelo que registra los gastos mensuales del consultorio del doctor.
@@ -712,3 +716,8 @@ class FotoPaciente(models.Model):
 
     def __str__(self):
         return f"Foto de {self.paciente} ({self.fecha_subida.strftime('%Y-%m-%d %H:%M')})"
+    
+
+
+
+    #cargo especialidad y gastos mensuales
