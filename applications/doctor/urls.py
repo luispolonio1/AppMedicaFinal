@@ -1,12 +1,12 @@
 from django.urls import path
 from applications.doctor.views.atencion_medica import AtencionListView, AtencionCreateView, AtencionUpdateView, \
-    AtencionDeleteView
+    AtencionDeleteView, AtencionDetailView
 from applications.doctor.views.citas import CitaMedicaListView, CitaMedicaCreateView, CitaMedicaUpdateView, CitaMedicaDeleteView,\
     CitaMedicaDetailView
 from applications.doctor.views.AtencionCita import AtenderPacienteView,ObtenerHorariosDisponiblesView
 from applications.doctor.views.detalleAtencion import DetalleAtencionCreateView
 from applications.doctor.views.ServiciosAdicionales import ServiciosAdicionalesCreateView
-from applications.doctor.views.AtencionCita import AtenderPacienteView, AtencionDetailView
+from applications.doctor.views.AtencionCita import AtenderPacienteView
 
 from applications.doctor.views.pago import PagoListView, PagoCreateView, PagoUpdateView, PagoDeleteView
 from applications.doctor.views.detalle_pago import DetallePagoListView, DetallePagoCreateView, \
@@ -14,7 +14,9 @@ from applications.doctor.views.detalle_pago import DetallePagoListView, DetalleP
 
 
 from applications.doctor.views.horario_atencion import HorarioAtencionListView, HorarioAtencionCreateView, \
-    HorarioAtencionUpdateView, HorarioAtencionDeleteView    
+    HorarioAtencionUpdateView, HorarioAtencionDeleteView  
+
+from applications.doctor.views.pago import PagoAPIView,CaptureOrderPAypal
 app_name='doctor' # define un espacio de nombre para la aplicacion
 urlpatterns = [
     # Rutas  para vistas relacionadas con Doctor
@@ -22,6 +24,7 @@ urlpatterns = [
     path('atencion_create/', AtencionCreateView.as_view(), name="atencion_create"),
     path('atencion_update/<int:pk>/', AtencionUpdateView.as_view(), name="atencion_update"),
     path('atencion_delete/<int:pk>/', AtencionDeleteView.as_view(), name="atencion_delete"),
+    path('atencion_detail/<int:pk>/', AtencionDetailView.as_view(), name="atencion_detail"),
 
 
     # Rutas para vistas relacionadas con Citas Medicas
@@ -41,8 +44,6 @@ urlpatterns = [
 
     # Rutas para Servicios Adicionales
     path('servicios_adicionales', ServiciosAdicionalesCreateView.as_view(), name='servicios_adicionales_create'),
-
-    path('atencion/<int:pk>/', AtencionDetailView.as_view(), name="atencion_detail"),
     
     path("pago_list/", PagoListView.as_view()), 
     path("pagos/",            PagoListView.as_view(),   name="pago_list"),
@@ -61,6 +62,10 @@ urlpatterns = [
     path("horarios/crear/", HorarioAtencionCreateView.as_view(), name="horario_create"),
     path("horarios/<int:pk>/editar/", HorarioAtencionUpdateView.as_view(), name="horario_update"),
     path("horarios/<int:pk>/eliminar/", HorarioAtencionDeleteView.as_view(), name="horario_delete"),
+
+    # Rutas para la API de pagos
+    path('api/order/', PagoAPIView.as_view(), name='pay-paypal'),
+    path('api/orders/<order_id>/capture', CaptureOrderPAypal.as_view(), name='capture-order-paypal'),
 
 ]
 
