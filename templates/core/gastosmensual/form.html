@@ -1,86 +1,267 @@
 {% extends 'home.html' %}
 <title>{% block title %}{{ title }}{% endblock %}</title>
 {% load static %}
-{% block content %}
-<section class="dark:bg-principal">
-    <div class="text-center" data-aos="fade" data-aos-delay="200">
-        <div class="sm:pt-28 lg:pt-4">
-            <h1 class="rounded-2xl bg-indigo-500 px-2 py-1 text-white uppercase text-4xl">
-                {{ title }}
-            </h1>
-        </div>
 
-        {% if form.non_field_errors %}
-        <div class="mx-4 lg:mx-20 mb-6" data-aos="fade-up">
-            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg max-w-4xl mx-auto">
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg"></i>
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 dark:bg-principal">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Contenedor principal -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden dark:bg-secundario">
+            <!-- Header -->
+            <div class="bg-blue-500 px-8 py-6">
+                <div class="flex items-center space-x-3 justify-center">
+                    <div class="bg-white/20 rounded-full p-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-red-800 dark:text-red-200 font-medium">
-                            Se encontraron errores en el formulario:
-                        </h3>
-                        <div class="mt-2 text-red-700 dark:text-red-300">
-                            <ul class="list-disc list-inside space-y-1">
+                    <h1 class="text-2xl font-bold text-white uppercase">{{ title }}</h1>
+                </div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="p-8">
+                <form method="post" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Error Messages -->
+                    {% if form.errors %}
+                        <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg dark:bg-red-900/30 dark:border-red-500">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                </svg>
+                                <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Por favor corrige los siguientes errores:</h3>
+                            </div>
+                            <ul class="mt-2 text-sm text-red-700 space-y-1 dark:text-red-300">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li class="flex items-start">
+                                            <span class="font-medium">{{ field.label }}:</span>
+                                            <span class="ml-1">{{ error }}</span>
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
                                 {% for error in form.non_field_errors %}
-                                <li>{{ error }}</li>
+                                    <li>{{ error }}</li>
                                 {% endfor %}
                             </ul>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data" class="space-y-6 py-4">
-            <div class="mx-4 lg:mx-20" data-aos="fade">
-                <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto"
-                     data-aos="fade-up" data-aos-delay="200">
-                    {% csrf_token %}
+                    {% endif %}
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for field in form %}
-                            {% comment %}
-                                Usamos col-span-full para campos textarea o widgets que tienen 'rows' para que ocupen todo el ancho.
-                            {% endcomment %}
-                            <div class="field-container {% if field.errors %}has-error{% endif %} {% if field.field.widget.attrs.rows %}col-span-full{% endif %}">
-                                <label for="{{ field.id_for_label }}" class="font-black uppercase text-lg block mb-2
-                                    {% if field.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
-                                    {{ field.label }}{% if field.field.required %} <span class="text-red-500">*</span>{% endif %}
-                                </label>
+                        <div class="group {% if field.field.widget.attrs.rows %}col-span-full{% endif %}">
+                            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
+                                {{ field.label }}{% if field.field.required %} <span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="relative">
                                 {{ field }}
                                 {% if field.help_text %}
                                     <p class="text-gray-500 dark:text-gray-400 text-xs italic mt-1">{{ field.help_text }}</p>
                                 {% endif %}
-                                {% for error in field.errors %}
-                                    <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</p>
-                                {% endfor %}
                             </div>
+                        </div>
                         {% endfor %}
                     </div>
-
-                    <!-- Botones de acción -->
-                    <div class="flex flex-col md:flex-row justify-center items-center mt-8 space-y-3 md:space-y-0 md:space-x-8">
-                        <button type="submit"
-                            class="w-full md:w-auto bg-blue-700 hover:bg-blue-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                            <i class="fa-solid fa-save mr-2"></i>Guardar
-                        </button>
-                        <a href="{% url 'core:gastomensual_list' %}"
-                           class="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white py-3 px-8 rounded-lg flex items-center justify-center transition-all duration-300 font-medium shadow-lg hover:shadow-xl">
-                            <i class="fa-solid fa-xmark mr-2"></i>Cancelar
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <a href="{% url 'core:gastomensual_list' %}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                            </svg>
+                            Cancelar
                         </a>
+                        <button type="submit" class="inline-flex items-center px-8 py-3 border border-transparent bg-blue-600 text-white font-medium rounded-lg shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                            </svg>
+                            Guardar Gasto
+                        </button>
                     </div>
-
-                </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</section>
+</div>
 
+<!-- Estilos consistentes con el formulario de empleados -->
 <style>
-/* Estilos para campos con errores (reutilizados) */
+/* Estilos para los campos del formulario */
+input[type="text"], 
+input[type="email"], 
+input[type="number"], 
+input[type="date"], 
+input[type="datetime-local"],
+input[type="tel"],
+input[type="file"],
+textarea,
+select {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    background-color: #ffffff !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Modo oscuro para inputs */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="datetime-local"],
+.dark input[type="tel"],
+.dark input[type="file"],
+.dark textarea,
+.dark select {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #f3f4f6 !important;
+}
+
+/* Hover states */
+input[type="text"]:hover, 
+input[type="email"]:hover, 
+input[type="number"]:hover, 
+input[type="date"]:hover, 
+input[type="datetime-local"]:hover,
+input[type="tel"]:hover,
+input[type="file"]:hover,
+textarea:hover,
+select:hover {
+    border-color: #9ca3af !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Focus states para campos */
+input[type="text"]:focus, 
+input[type="email"]:focus, 
+input[type="number"]:focus, 
+input[type="date"]:focus, 
+input[type="datetime-local"]:focus,
+input[type="tel"]:focus,
+input[type="file"]:focus,
+textarea:focus,
+select:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Modo oscuro para focus */
+.dark input[type="text"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="date"]:focus,
+.dark input[type="datetime-local"]:focus,
+.dark input[type="tel"]:focus,
+.dark input[type="file"]:focus,
+.dark textarea:focus,
+.dark select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* Campos monetarios con símbolo $ */
+.currency-input {
+    position: relative;
+}
+.currency-input::before {
+    content: "$";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    font-weight: 500;
+}
+.currency-input input {
+    padding-left: 28px !important;
+}
+
+/* Textarea specific styling */
+textarea {
+    min-height: 100px !important;
+    resize: vertical !important;
+}
+
+/* Select styling */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+    background-position: right 12px center !important;
+    background-repeat: no-repeat !important;
+    background-size: 16px 16px !important;
+    padding-right: 40px !important;
+    appearance: none !important;
+}
+
+.dark select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+}
+
+/* File input styling */
+input[type="file"] {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px dashed #d1d5db !important;
+    border-radius: 8px !important;
+    background-color: #f9fafb !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.dark input[type="file"] {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+}
+
+input[type="file"]:hover {
+    border-color: #3b82f6 !important;
+    background-color: #eff6ff !important;
+}
+
+.dark input[type="file"]:hover {
+    background-color: #1e40af !important;
+}
+
+input[type="file"]:focus {
+    outline: none !important;
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* File input button styling */
+input[type="file"]::file-selector-button {
+    margin-right: 12px !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 20px !important;
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.dark input[type="file"]::file-selector-button {
+    background-color: #1e40af !important;
+    color: #bfdbfe !important;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: #dbeafe !important;
+}
+
+.dark input[type="file"]::file-selector-button:hover {
+    background-color: #1e3a8a !important;
+}
+
+/* Error state */
 .field-container.has-error input,
 .field-container.has-error select,
 .field-container.has-error textarea {
@@ -89,33 +270,23 @@
     color: #991b1b !important;
 }
 
+.dark .field-container.has-error input,
+.dark .field-container.has-error select,
+.dark .field-container.has-error textarea {
+    background-color: rgba(153, 27, 27, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: #ef4444 !important;
+}
+
 .field-container.has-error input:focus,
 .field-container.has-error select:focus,
 .field-container.has-error textarea:focus {
-    border-color: #dc2626 !important;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
     outline: none !important;
 }
 
-@media (prefers-color-scheme: dark) {
-    .field-container.has-error input,
-    .field-container.has-error select,
-    .field-container.has-error textarea {
-        background-color: rgba(153, 27, 27, 0.2) !important;
-        color: #fca5a5 !important;
-        border-color: #ef4444 !important;
-    }
-    
-    .field-container.has-error input:focus,
-    .field-container.has-error select:focus,
-    .field-container.has-error textarea:focus {
-        box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.4) !important;
-    }
-}
-
-.field-container.has-error input[type="checkbox"] {
-    border-color: #ef4444 !important;
-    accent-color: #ef4444 !important;
+.field-container.has-error {
+    animation: shake 0.5s ease-in-out;
 }
 
 @keyframes shake {
@@ -123,9 +294,28 @@
     10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
     20%, 40%, 60%, 80% { transform: translateX(2px); }
 }
-
-.field-container.has-error {
-    animation: shake 0.5s ease-in-out;
-}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación suave al hacer scroll
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    // Si hay campos de tipo moneda, agregar el símbolo $
+    const currencyFields = document.querySelectorAll('input[type="number"]');
+    currencyFields.forEach(field => {
+        if (field.classList.contains('currency')) {
+            const container = document.createElement('div');
+            container.className = 'currency-input';
+            field.parentNode.insertBefore(container, field);
+            container.appendChild(field);
+        }
+    });
+});
+</script>
 {% endblock %}
