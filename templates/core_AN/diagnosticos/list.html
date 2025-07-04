@@ -78,16 +78,16 @@
     {% include 'fragments/pagination.html' with page_obj=page_obj %}
 
     <!-- Botones -->
-    <div class="flex flex-col md:flex-row justify-center p-4 space-y-2 md:space-y-0 md:space-x-2">
-      {% if permissions.add_diagnostico %}
+    <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
+      {% if permissions.add_menu %}
       <a href="{% url 'core:diagnostico_create' %}"
          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nuevo Diagnóstico
+        <i class="fa-solid fa-plus mr-2"></i> Nuevo diagnóstico
       </a>
       {% endif %}
+
       <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-house mr-2"></i> Inicio
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center"> Inicio
       </a>
     </div>
   </div>

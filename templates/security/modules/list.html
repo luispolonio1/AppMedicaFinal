@@ -156,22 +156,20 @@
     <!-- Botones -->
     <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
       <a href="{% url 'security:permission_dashboard' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-backward-step text-lg"></i>
+          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+          <i class="fa-solid fa-backward-step"></i> atras
       </a>
-
-      {% if permissions.add_module %}
+      {% if permissions.add_menu %}
       <a href="{% url 'security:module_create' %}"
          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nuevo Módulo
+        <i class="fa-solid fa-plus mr-2"></i> Nuevo Modulo
       </a>
       {% endif %}
 
       <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-house mr-2"></i> Inicio
-      </a>
-    </div>
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+         <i class="fa-solid fa-house"></i> Inicio
+  </div>
   </div>
 </section>
 
