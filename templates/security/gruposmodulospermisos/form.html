@@ -181,6 +181,75 @@ document.addEventListener('DOMContentLoaded', function() {
     iconInput.addEventListener('keyup', updateIconPreview);
     iconInput.addEventListener('change', updateIconPreview);
 });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const moduleSelect = document.getElementById('id_module');
+        moduleSelect.addEventListener('change', function () {
+            const moduleId = this.value;
+            if (moduleId) {
+                permisos_module(moduleId);
+            } else {
+                const permissionsSelect = document.getElementById('id_permissions');
+                permissionsSelect.innerHTML = '<option>Selecciona un módulo primero</option>';
+                permissionsSelect.disabled = true;
+            }
+        });
+    });
+    
+    const permisos_module = (id) => {
+
+        const permissionsSelect = document.getElementById('id_permissions');
+
+
+        permissionsSelect.innerHTML = '';
+
+
+        permissionsSelect.disabled = true;
+
+
+        const loadingOption = document.createElement('option');
+        loadingOption.text = 'Cargando permisos...';
+        permissionsSelect.add(loadingOption);
+        
+        var url = `{% url 'security:get_permissions' 0 %}`.replace('0', id);
+        
+        fetch(url)
+        .then(response => {
+            if (!response.ok) throw new Error("Error en la respuesta del servidor");
+            return response.json();
+        })
+        .then(data => {
+
+            if (data.length === 0) {
+                const option = document.createElement('option');
+                option.text = 'Este módulo no tiene permisos.';
+                permissionsSelect.add(option);
+                permissionsSelect.disabled = true;
+                return;
+            }
+
+            permissionsSelect.innerHTML = ''
+
+            data.forEach(perm => {
+                const option = document.createElement('option');
+                option.value = perm.id;
+                option.text = perm.name;  // o ${perm.name} (${perm.codename})
+                permissionsSelect.add(option);
+            });
+
+            // Habilita el campo
+            permissionsSelect.disabled = false;
+        })
+        .catch(error => {
+            console.error('Error al obtener permisos:', error);
+            permissionsSelect.innerHTML = '';
+            const errorOption = document.createElement('option');
+            errorOption.text = 'Error al cargar permisos';
+            permissionsSelect.add(errorOption);
+            permissionsSelect.disabled = true;
+        });
+    }
+
 </script>
 
 {% endblock %}

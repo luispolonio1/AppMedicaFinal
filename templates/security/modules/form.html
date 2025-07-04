@@ -255,32 +255,34 @@
                             {% endif %}
                         </div>
 
-                       <!-- Campo Permissions -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <!-- Permisos disponibles -->
-                            <div>
-                                <label class="block text-lg font-black uppercase mb-2 dark:text-blue-300">Permisos disponibles</label>
-                                <select id="available_permissions" multiple
-                                        class="w-full h-48 border rounded p-2 dark:bg-gray-800 dark:text-white"></select>
+                        <!-- Campo Permissions -->
+                        <div class="field-container {% if form.permissions.errors %}has-error{% endif %}">
+                            <label for="{{ form.permissions.id_for_label }}"
+                                class="font-black uppercase text-lg block mb-2
+                                       {% if form.permissions.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.permissions.label }}
+                                {% if form.permissions.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="relative {% if form.permissions.errors %}border-2 border-red-300 dark:border-red-600 rounded-lg p-2 bg-red-50 dark:bg-red-900/20{% endif %}">
+                                {{ form.permissions }}
+                                {% if form.permissions.errors %}
+                                <div class="absolute top-2 right-2 pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                </div>
+                                {% endif %}
                             </div>
-
-                            <!-- Permisos asignados -->
-                            <div>
-                                <label class="block text-lg font-black uppercase mb-2 dark:text-blue-300">Permisos asignados</label>
-                                <select id="assigned_permissions" name="permissions" multiple
-                                        class="w-full h-48 border rounded p-2 dark:bg-gray-800 dark:text-white"></select>
+                            {% if form.permissions.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.permissions.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
                             </div>
+                            {% endif %}
                         </div>
-
-                        <!-- Botones para mover -->
-                        <div class="flex justify-center space-x-4 my-4">
-                            <button type="button" id="add_permission"
-                                    class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">→
-                            </button>
-                            <button type="button" id="remove_permission"
-                                    class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded">←
-                            </button>
-                        </div>
+                    </div>
 
                     <!-- Botones de acción -->
                      <div class="flex flex-col md:flex-row justify-center items-center mt-8 space-y-3 md:space-y-0 md:space-x-8">
@@ -376,56 +378,6 @@ document.addEventListener('DOMContentLoaded', function() {
     iconInput.addEventListener('input', updateIconPreview);
     iconInput.addEventListener('keyup', updateIconPreview);
     iconInput.addEventListener('change', updateIconPreview);
-});
-document.addEventListener('DOMContentLoaded', function () {
-    const moduleId = '{{ form.instance.pk|default_if_none:"" }}';
-    const container = document.getElementById('checkboxPermissions');
-    const assignedPermissions = new Set();
-
-    // Cargar permisos asignados y marcar los checkboxes
-    function loadAssignedPermissions() {
-        if (!moduleId) return Promise.resolve();
-
-        return fetch(`/security/get-permissions/${moduleId}/`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(p => assignedPermissions.add(p.id));
-            });
-    }
-
-    // Cargar todos los permisos y crear checkboxes
-    function loadAllPermissions() {
-        return fetch('/security/get-all-permissions/')
-            .then(res => res.json())
-            .then(data => {
-                container.innerHTML = ''; // limpiar
-                data.forEach(p => {
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = 'perm_' + p.id;
-                    checkbox.name = 'permissions';
-                    checkbox.value = p.id;
-                    if (assignedPermissions.has(p.id)) checkbox.checked = true;
-
-                    const label = document.createElement('label');
-                    label.htmlFor = checkbox.id;
-                    label.classList.add('ml-2', 'text-sm', 'cursor-pointer');
-                    label.textContent = p.name + ` (${p.codename})`;
-
-                    const div = document.createElement('div');
-                    div.classList.add('flex', 'items-center');
-                    div.appendChild(checkbox);
-                    div.appendChild(label);
-
-                    container.appendChild(div);
-                });
-            });
-    }
-
-    // Llenar checkboxes con datos
-    loadAssignedPermissions().then(loadAllPermissions);
-
-    // Al enviar el formulario, se enviarán los checkboxes seleccionados normalmente
 });
 </script>
 

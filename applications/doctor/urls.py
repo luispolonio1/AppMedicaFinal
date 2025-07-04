@@ -6,13 +6,11 @@ from applications.doctor.views.citas import CitaMedicaListView, CitaMedicaCreate
 from applications.doctor.views.AtencionCita import AtenderPacienteView,ObtenerHorariosDisponiblesView
 from applications.doctor.views.detalleAtencion import DetalleAtencionCreateView
 from applications.doctor.views.ServiciosAdicionales import ServiciosAdicionalesCreateView
-from applications.doctor.views.AtencionCita import AtenderPacienteView, AtencionDetailView
+from applications.doctor.views.AtencionCita import AtenderPacienteView
 
 from applications.doctor.views.pago import PagoListView, PagoCreateView, PagoUpdateView, PagoDeleteView
 from applications.doctor.views.detalle_pago import DetallePagoListView, DetallePagoCreateView, \
     DetallePagoUpdateView, DetallePagoDeleteView    
-
-
 from applications.doctor.views.horario_atencion import HorarioAtencionListView, HorarioAtencionCreateView, \
     HorarioAtencionUpdateView, HorarioAtencionDeleteView    
 app_name='doctor' # define un espacio de nombre para la aplicacion
@@ -41,8 +39,6 @@ urlpatterns = [
 
     # Rutas para Servicios Adicionales
     path('servicios_adicionales', ServiciosAdicionalesCreateView.as_view(), name='servicios_adicionales_create'),
-
-    path('atencion/<int:pk>/', AtencionDetailView.as_view(), name="atencion_detail"),
     
     path("pago_list/", PagoListView.as_view()), 
     path("pagos/",            PagoListView.as_view(),   name="pago_list"),
