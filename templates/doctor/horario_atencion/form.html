@@ -293,6 +293,78 @@
                     </div>
                 </form>
             </div>
+
+<section class="mt-4 bg-white dark:bg-principal">
+  <div class="container mx-auto px-4">
+
+    <!-- Título -->
+    <h1 class="text-3xl md:text-4xl font-bold text-white bg-indigo-500 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
+      {{ grabar }}
+    </h1>
+
+    {% if form.non_field_errors %}
+      <div class="mx-auto max-w-4xl mt-6">
+        <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
+          <div class="flex items-start">
+            <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg mt-0.5"></i>
+            <div class="ml-3">
+              <h3 class="text-red-800 dark:text-red-200 font-semibold">Se encontraron errores en el formulario:</h3>
+              <ul class="list-disc list-inside mt-2 space-y-1 text-red-700 dark:text-red-300">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <form method="post" class="space-y-10 py-8">
+      <div class="mx-4 lg:mx-20">
+        <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto shadow-lg border border-sky-100 dark:border-secundario">
+          {% csrf_token %}
+
+          <!-- Campos del formulario -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for field in form.visible_fields %}
+            <div class="field-container {% if field.errors %}has-error{% endif %}">
+              <label for="{{ field.id_for_label }}"
+                     class="font-black uppercase text-sm md:text-base block mb-2
+                            {% if field.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
+                {{ field.label }}
+                {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+              </label>
+              <div class="relative">
+                {{ field }}
+                {% if field.errors %}
+                  <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-2 top-3"></i>
+                {% endif %}
+              </div>
+              {% if field.help_text %}
+                <small class="text-gray-500 dark:text-gray-400">{{ field.help_text }}</small>
+              {% endif %}
+              {% for error in field.errors %}
+                <div class="text-red-600 dark:text-red-400 text-sm mt-1">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ error }}
+                </div>
+              {% endfor %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <!-- Botones -->
+          <div class="flex flex-col md:flex-row justify-center items-center mt-12 space-y-3 md:space-y-0 md:space-x-8">
+            <button type="submit"
+                    class="w-full md:w-auto bg-sky-600 hover:bg-sky-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+              <i class="fa-solid fa-save mr-2"></i>{{ grabar }}
+            </button>
+            <a href="{{ back_url }}"
+               class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+              <i class="fa-solid fa-xmark mr-2"></i>Cancelar
+            </a>
+          </div>
+
         </div>
     </div>
 </div>
@@ -319,6 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+
     // Mejorar el comportamiento de los campos de archivo
     const fileInputs = document.querySelectorAll('input[type="file"]');
     fileInputs.forEach(input => {
@@ -331,3 +404,33 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
+<!-- Estilos para errores -->
+<style>
+.field-container.has-error input,
+.field-container.has-error select,
+.field-container.has-error textarea {
+  border-color: #ef4444 !important;
+  background-color: rgba(254, 242, 242, 0.5) !important;
+  color: #991b1b !important;
+}
+@media (prefers-color-scheme: dark) {
+  .field-container.has-error input,
+  .field-container.has-error select,
+  .field-container.has-error textarea {
+    background-color: rgba(153, 27, 27, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: #ef4444 !important;
+  }
+}
+.field-container.has-error {
+  animation: shake 0.5s ease-in-out;
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+</style>
+{% endblock %}
+

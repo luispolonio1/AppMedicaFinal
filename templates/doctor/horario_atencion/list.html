@@ -385,6 +385,96 @@
                 <span>Inicio</span>
             </a>
         </div>
+
+<section class="mt-4 bg-white dark:bg-principal">
+  <div class="container mx-auto px-4">
+
+    <!-- Título -->
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
+      Horarios de Atención
+    </h1>
+
+    <!-- Buscador -->
+    <div class="mt-6 flex justify-center">
+      <form method="get" class="relative w-full max-w-lg">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar día"
+               class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
+                      focus:outline-none focus:ring-2 focus:ring-sky-500
+                      bg-white text-gray-800 dark:bg-principal dark:text-gray-200">
+      </form>
+    </div>
+
+    <!-- Tabla -->
+    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
+      <table class="w-full text-center text-sm md:text-base">
+        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
+          <tr>
+            <th class="py-3 px-4">Día</th>
+            <th class="py-3 px-4">Horario</th>
+            <th class="py-3 px-4">Intervalo</th>
+            <th class="py-3 px-4">Activo</th>
+            <th class="py-3 px-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in horarios %}
+          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario
+                     hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300
+                     text-gray-600 dark:text-gray-400">
+            <td class="py-4 px-4 font-semibold">{{ item.dia_semana }}</td>
+            <td class="py-4 px-4">{{ item.hora_inicio }} - {{ item.hora_fin }}</td>
+            <td class="py-4 px-4">
+              {% if item.intervalo_desde and item.intervalo_hasta %}
+                {{ item.intervalo_desde }} - {{ item.intervalo_hasta }}
+              {% else %}
+                –
+              {% endif %}
+            </td>
+            <td class="py-4 px-4">
+              {% if item.activo %}
+              <span class="bg-green-100 dark:bg-green-800 px-2 py-1 rounded-full text-sm">Sí</span>
+              {% else %}
+              <span class="bg-red-100 dark:bg-red-800 px-2 py-1 rounded-full text-sm">No</span>
+              {% endif %}
+            </td>
+            <td class="py-4 px-4">
+              {% if permissions.change_horarioatencion %}
+              <a href="{% url 'doctor:horario_update' item.id %}"
+                 class="text-sky-500 hover:text-sky-700 mx-1 transition-colors duration-200">
+                <i class="fa-solid fa-edit text-lg"></i>
+              </a>
+              {% endif %}
+              {% if permissions.delete_horarioatencion %}
+              <a href="#"
+                 class="text-red-600 hover:text-red-800 mx-1 transition-colors duration-200"
+                 onclick="openDeleteModal('{{ item.id }}', 'Horario de {{ item.dia_semana }}')">
+                <i class="fa-solid fa-trash text-lg"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    {% include 'fragments/pagination.html' with page_obj=page_obj %}
+
+    <!-- Botones -->
+    <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
+      {% if permissions.add_horarioatencion %}
+      <a href="{% url 'doctor:horario_create' %}"
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-plus mr-2"></i> Nuevo Horario
+      </a>
+      {% endif %}
+      <a href="{% url 'home' %}"
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-house mr-2"></i> Inicio
+      </a>
+
     </div>
 </div>
 
