@@ -4,8 +4,8 @@ from django.db import models
 class DiaSemanaChoices(models.TextChoices):
     LUNES = 'lunes', 'Lunes'
     MARTES = 'martes', 'Martes'
-    MIERCOLES = 'miércoles', 'Miércoles'
+    MIERCOLES = 'miercoles', 'Miercoles'
     JUEVES = 'jueves', 'Jueves'
     VIERNES = 'viernes', 'Viernes'
-    SABADO = 'sábado', 'Sábado'
+    SABADO = 'sabado', 'Sabado'
     DOMINGO = 'domingo', 'Domingo'

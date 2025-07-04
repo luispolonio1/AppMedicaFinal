@@ -423,3 +423,18 @@ def obtener_contexto_paciente(id_paciente):
             'paciente_data': '',
             'paciente_json': 'null'
         }
+
+class AtencionDetailView(PermissionMixin, ListView):
+    model = Atencion
+    template_name = 'doctor/atenciones/detail.html'
+    context_object_name = 'atencion'
+    permission_required = 'view_atencion'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['back_url'] = reverse_lazy('doctor:atencion_list')
+        context['paciente_json'] = obtener_contexto_paciente(self.object.paciente.id)['paciente_json']
+        return context
+
+    def get_queryset(self):
+        return self.model.objects.filter(id=self.kwargs['pk'])
