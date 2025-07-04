@@ -1,78 +1,95 @@
-{% extends 'base.html' %}
-
-{% block title %}Registrar Pago{% endblock %}
+{% extends 'home.html' %}
+{% load static %}
+<title>{% block title %}Registrar Pago{% endblock %}</title>
 
 {% block content %}
-<div class="max-w-2xl mx-auto mt-10 bg-white rounded-xl shadow-lg p-8">
-    <h2 class="text-2xl font-bold mb-6 text-indigo-700">Registrar Pago</h2>
-    <!-- Botón para regresar a la lista de pagos -->
+<section class="mt-4 bg-white dark:bg-principal">
+  <div class="container mx-auto max-w-3xl px-4 py-8 rounded-xl shadow-lg">
+
+    <!-- Título -->
+    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow text-center uppercase mb-6">
+      Registrar Pago
+    </h2>
+
+    <!-- Botón volver -->
     <div class="mb-6">
-        <a href="{% url 'doctor:pago_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-lg shadow hover:bg-gray-300 transition">
-            &#8592; Regresar a la lista de pagos
-        </a>
+      <a href="{% url 'doctor:pago_list' %}"
+         class="bg-sky-100 hover:bg-sky-200 text-sky-800 px-4 py-2 rounded-full shadow transition-colors duration-200 inline-flex items-center">
+        <i class="fa-solid fa-arrow-left mr-2"></i> Volver a la lista de pagos
+      </a>
     </div>
-    <form id="pagoForm" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="grid grid-cols-1 gap-6">
-            <!-- Atencion -->
-            <div>
-                <label for="id_atencion" class="block text-sm font-medium text-gray-700">Atención relacionada</label>
-                {{ form.atencion }}
-            </div>
-            <!-- Metodo de pago -->
-            <div>
-                <label for="id_metodo_pago" class="block text-sm font-medium text-gray-700">Método de pago</label>
-                {{ form.metodo_pago }}
-            </div>
-            <!-- Monto total -->
-            <div>
-                <label for="id_monto_total" class="block text-sm font-medium text-gray-700">Monto total</label>
-                {{ form.monto_total }}
-            </div>
-            <!-- Estado -->
-            <div>
-                <label for="id_estado" class="block text-sm font-medium text-gray-700">Estado</label>
-                {{ form.estado }}
-            </div>
-            <!-- Fecha de pago -->
-            <div>
-                <label for="id_fecha_pago" class="block text-sm font-medium text-gray-700">Fecha de pago</label>
-                {{ form.fecha_pago }}
-            </div>
-            <!-- Nombre pagador -->
-            <div>
-                <label for="id_nombre_pagador" class="block text-sm font-medium text-gray-700">Nombre del pagador</label>
-                {{ form.nombre_pagador }}
-            </div>
-            <!-- Referencia externa -->
-            <div>
-                <label for="id_referencia_externa" class="block text-sm font-medium text-gray-700">Referencia externa</label>
-                {{ form.referencia_externa }}
-            </div>
-            <!-- Evidencia pago -->
-            <div>
-                <label for="id_evidencia_pago" class="block text-sm font-medium text-gray-700">Comprobante / evidencia</label>
-                {{ form.evidencia_pago }}
-            </div>
-            <!-- Observaciones -->
-            <div>
-                <label for="id_observaciones" class="block text-sm font-medium text-gray-700">Observaciones</label>
-                {{ form.observaciones }}
-            </div>
-            <!-- Activo -->
-            <div class="flex items-center">
-                {{ form.activo }}
-                <label for="id_activo" class="ml-2 block text-sm text-gray-700">Activo</label>
-            </div>
-        </div>
-        <button type="submit" class="mt-6 w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">Guardar Pago</button>
+
+    <!-- Formulario -->
+    <form id="pagoForm" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+
+      <div>
+        <label for="id_atencion" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Atención relacionada</label>
+        {{ form.atencion }}
+      </div>
+
+      <div>
+        <label for="id_metodo_pago" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Método de pago</label>
+        {{ form.metodo_pago }}
+      </div>
+
+      <div>
+        <label for="id_monto_total" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Monto total</label>
+        {{ form.monto_total }}
+      </div>
+
+      <div>
+        <label for="id_estado" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Estado</label>
+        {{ form.estado }}
+      </div>
+
+      <div>
+        <label for="id_fecha_pago" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Fecha de pago</label>
+        {{ form.fecha_pago }}
+      </div>
+
+      <div>
+        <label for="id_nombre_pagador" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Nombre del pagador</label>
+        {{ form.nombre_pagador }}
+      </div>
+
+      <div>
+        <label for="id_referencia_externa" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Referencia externa</label>
+        {{ form.referencia_externa }}
+      </div>
+
+      <div>
+        <label for="id_evidencia_pago" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Comprobante / evidencia</label>
+        {{ form.evidencia_pago }}
+      </div>
+
+      <div>
+        <label for="id_observaciones" class="block text-sm font-semibold text-gray-700 dark:text-gray-200">Observaciones</label>
+        {{ form.observaciones }}
+      </div>
+
+      <div class="flex items-center">
+        {{ form.activo }}
+        <label for="id_activo" class="ml-2 text-sm text-gray-700 dark:text-gray-200">Activo</label>
+      </div>
+
+      <!-- Botón Guardar -->
+      <button type="submit"
+              class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 rounded-full shadow transition duration-200">
+        <i class="fa-solid fa-floppy-disk mr-2"></i> Guardar Pago
+      </button>
     </form>
-    
+
+    <!-- Mensajes -->
     <div id="pagoMsg" class="mt-4 text-center"></div>
+
+    <!-- PayPal -->
     <div id="paypal-button-container" class="mt-8"></div>
     <div id="result-message" class="mt-4 text-center"></div>
-</div>
+  </div>
+</section>
 
+<!-- Scripts -->
 <script>
 document.getElementById('pagoForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -80,7 +97,6 @@ document.getElementById('pagoForm').addEventListener('submit', async function(e)
     const url = form.getAttribute('action') || window.location.href;
     const formData = new FormData(form);
 
-    // Si tienes archivos, usa FormData directamente
     const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -101,120 +117,57 @@ document.getElementById('pagoForm').addEventListener('submit', async function(e)
     }
 });
 </script>
-<script
-    src="https://www.paypal.com/sdk/js?client-id=AcbsbRcDmtknpJC2JJZ2upQ2DdkcihDaYw2Ckv69TxALnpnvzD1ug_O6foGXwry-soGMZkdXVOtB15io"
-    data-sdk-integration-source="developer-studio"></script>
+
+<script src="https://www.paypal.com/sdk/js?client-id=AcbsbRcDmtknpJC2JJZ2upQ2DdkcihDaYw2Ckv69TxALnpnvzD1ug_O6foGXwry-soGMZkdXVOtB15io"
+        data-sdk-integration-source="developer-studio"></script>
+
 <script type="module">
 const paypalButtons = window.paypal.Buttons({
-   style: {
+    style: {
         shape: "rect",
         layout: "vertical",
         color: "gold",
         label: "paypal",
     },
-   message: {
-        amount: 100,
-    },
-   async createOrder() {
-        // Obtener el monto del formulario antes de crear la orden
+    async createOrder() {
         const montoInput = document.querySelector('#id_monto_total');
         const monto = montoInput ? parseFloat(montoInput.value) || 0 : 0;
-
         try {
             const response = await fetch("/api/order/", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    amount: monto,
-                    // puedes agregar otros campos si lo necesitas
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: monto }),
             });
-
             const orderData = await response.json();
-
-            if (orderData.id) {
-                return orderData.id;
-            }
-            const errorDetail = orderData?.details?.[0];
-            const errorMessage = errorDetail
-                ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
-                : JSON.stringify(orderData);
-
-            throw new Error(errorMessage);
+            if (orderData.id) return orderData.id;
+            throw new Error(orderData?.details?.[0]?.description || JSON.stringify(orderData));
         } catch (error) {
             console.error(error);
-            // resultMessage(`Could not initiate PayPal Checkout...<br><br>${error}`);
         }
     },
-   async onApprove(data, actions) {
+    async onApprove(data, actions) {
         try {
-            const response = await fetch(
-                `/api/orders/${data.orderID}/capture`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-
+            const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
             const orderData = await response.json();
-            // Three cases to handle:
-            //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-            //   (2) Other non-recoverable errors -> Show a failure message
-            //   (3) Successful transaction -> Show confirmation or thank you message
-
             const errorDetail = orderData?.details?.[0];
-
-            if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
-                // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-                // recoverable state, per
-                // https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
-                return actions.restart();
-            } else if (errorDetail) {
-                // (2) Other non-recoverable errors -> Show a failure message
-                throw new Error(
-                    `${errorDetail.description} (${orderData.debug_id})`
-                );
-            } else if (!orderData.purchase_units) {
-                throw new Error(JSON.stringify(orderData));
-            } else {
-                // (3) Successful transaction -> Show confirmation or thank you message
-                // Or go to another URL:  actions.redirect('thank_you.html');
-                const transaction =
-                    orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
-                    orderData?.purchase_units?.[0]?.payments
-                        ?.authorizations?.[0];
-                resultMessage(
-                    `Transaction ${transaction.status}: ${transaction.id}<br>
-          <br>See console for all available details`
-                );
-                console.log(
-                    "Capture result",
-                    orderData,
-                    JSON.stringify(orderData, null, 2)
-                );
-            }
+            if (errorDetail?.issue === "INSTRUMENT_DECLINED") return actions.restart();
+            if (errorDetail) throw new Error(errorDetail.description);
+            const transaction = orderData?.purchase_units?.[0]?.payments?.captures?.[0];
+            resultMessage(`Transacción ${transaction.status}: ${transaction.id}`);
+            console.log("Resultado:", orderData);
         } catch (error) {
             console.error(error);
-            resultMessage(
-                `Sorry, your transaction could not be processed...<br><br>${error}`
-            );
+            resultMessage(`Error en la transacción<br><br>${error}`);
         }
     },
-
-   
 });
 paypalButtons.render("#paypal-button-container");
 
-
-// Example function to show a result to the user. Your site's UI library can be used instead.
 function resultMessage(message) {
-    const container = document.querySelector("#result-message");
-    container.innerHTML = message;
+    document.querySelector("#result-message").innerHTML = message;
 }
-
 </script>
 {% endblock %}
