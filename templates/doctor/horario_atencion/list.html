@@ -5,6 +5,387 @@
 {% block content %}
 {% include 'fragments/messages.html' %}
 
+<style>
+/* Estilos personalizados para la gestión de horarios */
+.horario-card {
+    transition: all 0.3s ease;
+    border: 1px solid #d7dadc;
+    background-color: white;
+}
+
+.horario-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #c4c7ca;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-active {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.status-inactive {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 40px;
+    transition: all 0.2s ease;
+    border-color: #d7dadc;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(12, 93, 169, 0.1);
+    border-color: #0c5da9;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-edit {
+    background-color: rgba(215, 218, 220, 0.5);
+    color: #4b5563;
+}
+
+.btn-edit:hover {
+    background-color: rgba(215, 218, 220, 0.7);
+}
+
+.btn-delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border: 1px solid #d7dadc;
+}
+
+.horario-icon {
+    background: linear-gradient(135deg, #0c5da9 0%, #0a4d8c 100%);
+    color: white;
+    border-radius: 50%;
+    padding: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.intervalo-badge {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.horario-time {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .horario-card {
+        margin-bottom: 1rem;
+    }
+    
+    .hidden-mobile {
+        display: none;
+    }
+}
+</style>
+
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200">
+            <div class="bg-indigo-500 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white/20 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl text-white font-black">Horarios de Atención</h1>
+                            <p class="text-white text-sm">Administra los horarios de atención médica</p>
+                        </div>
+                    </div>
+                    <!-- Botón Agregar Horario -->
+                    {% if permissions.add_horarioatencion %}
+                    <a href="{% url 'doctor:horario_create' %}" class="inline-flex items-center px-4 py-2 bg-white text-indigo-800 font-semibold rounded-lg shadow hover:bg-indigo-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nuevo Horario
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-indigo-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Horarios</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ paginator.count|default:horarios|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Activos</p>
+                                <p class="text-2xl font-bold text-green-600">{{ horarios_activos|default:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-red-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Inactivos</p>
+                                <p class="text-2xl font-bold text-red-600">{{ horarios_inactivos|default:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-indigo-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-indigo-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4m-6 0v1h6V7m-6 0H6m12 0h2"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Página</p>
+                                <p class="text-2xl font-bold text-indigo-800">{{ page_obj.number|default:1 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="search-container flex-1 max-w-md">
+                    <form method="get" class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               name="q" 
+                               value="{{ request.GET.q }}" 
+                               id="searchInput" 
+                               class="search-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" 
+                               placeholder="Buscar por día de la semana...">
+                    </form>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <select id="statusFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="">Todos los estados</option>
+                        <option value="activo">Activos</option>
+                        <option value="inactivo">Inactivos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de horarios -->
+        <div class="space-y-4">
+            {% if horarios %}
+                {% for item in horarios %}
+                <div class="horario-card bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" 
+                     data-dia="{{ item.dia_semana|lower }}"
+                     data-estado="{% if item.activo %}activo{% else %}inactivo{% endif %}">
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <!-- Icono del horario -->
+                                <div class="flex-shrink-0">
+                                    <div class="horario-icon">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Información del horario -->
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <h3 class="text-lg font-semibold text-gray-900">
+                                            {{ item.dia_semana }}
+                                        </h3>
+                                        {% if item.activo %}
+                                        <span class="status-badge status-active">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Activo
+                                        </span>
+                                        {% else %}
+                                        <span class="status-badge status-inactive">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Inactivo
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mt-2 flex items-center space-x-3">
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            <span class="horario-time">{{ item.hora_inicio }} - {{ item.hora_fin }}</span>
+                                        </div>
+                                        
+                                        {% if item.intervalo_desde and item.intervalo_hasta %}
+                                        <div class="flex items-center space-x-2">
+                                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                            </svg>
+                                            <span class="intervalo-badge">Intervalo: {{ item.intervalo_desde }} - {{ item.intervalo_hasta }}</span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mt-2 flex items-center space-x-4 text-sm">
+                                        <span class="flex items-center text-gray-500">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                            </svg>
+                                            ID: {{ item.id }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones -->
+                            <div class="flex items-center space-x-2">
+                                {% if permissions.change_horarioatencion %}
+                                <a href="{% url 'doctor:horario_update' item.id %}" class="action-btn btn-edit" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                
+                                {% if permissions.delete_horarioatencion %}
+                                <button class="action-btn btn-delete" 
+                                        title="Eliminar"
+                                        onclick="openDeleteModal('{{ item.id }}', 'Horario de {{ item.dia_semana }}')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Estado vacío -->
+                <div class="empty-state bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay horarios registrados</h3>
+                        <p class="mt-1 text-sm text-gray-500">{% if request.GET.q %}No se encontraron resultados para tu búsqueda.{% else %}Comienza creando tu primer horario de atención.{% endif %}</p>
+                        <div class="mt-6">
+                            {% if permissions.add_horarioatencion %}
+                            <a href="{% url 'doctor:horario_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-800 hover:bg-indigo-700">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Crear Horario
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Paginación -->
+        <div class="mt-6">
+            {% include 'fragments/pagination.html' with page_obj=page_obj %}
+        </div>
+        
+        <!-- Botón volver -->
+        <div class="mt-6 flex justify-center">
+            <a href="{% url 'home' %}" class="bg-indigo-500 hover:bg-indigo-800 text-white py-3 px-6 rounded-full flex items-center space-x-2 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                <span>Inicio</span>
+            </a>
+        </div>
+
 <section class="mt-4 bg-white dark:bg-principal">
   <div class="container mx-auto px-4">
 
@@ -93,20 +474,73 @@
          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
         <i class="fa-solid fa-house mr-2"></i> Inicio
       </a>
+
     </div>
-  </div>
-</section>
+</div>
 
 {% include 'fragments/delete.html' %}
+
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const horarioCards = document.querySelectorAll('.horario-card');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            horarioCards.forEach(card => {
+                const dia = card.getAttribute('data-dia') || '';
+                
+                if (dia.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Status filter functionality
+    const statusFilter = document.getElementById('statusFilter');
+    
+    function filterHorarios() {
+        const statusValue = statusFilter ? statusFilter.value.toLowerCase() : '';
+        const searchValue = searchInput ? searchInput.value.toLowerCase() : '';
+        
+        horarioCards.forEach(card => {
+            const dia = card.getAttribute('data-dia') || '';
+            const estado = card.getAttribute('data-estado') || '';
+            
+            const matchesSearch = dia.includes(searchValue);
+            const matchesStatus = !statusValue || estado === statusValue;
+
+            if (matchesSearch && matchesStatus) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterHorarios);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', filterHorarios);
+    }
+});
+
 function openDeleteModal(id, texto) {
-  const deleteForm = document.getElementById('deleteForm');
-  deleteForm.action = "{% url 'doctor:horario_delete' 0 %}".replace('0', id);
-  document.getElementById('Description').textContent = texto;
-  document.getElementById('deleteModal').classList.remove('hidden');
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = "{% url 'doctor:horario_delete' 0 %}".replace('0', id);
+    document.getElementById('Description').textContent = texto;
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
+
 function closeModal() {
-  document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
 }
 </script>
 {% endblock %}

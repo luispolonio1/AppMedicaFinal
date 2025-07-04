@@ -38,6 +38,8 @@ class PagoListView(PermissionMixin, ListViewMixin, ListView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["create_url"] = reverse_lazy("doctor:pago_create")
+        ctx['pagados']= self.get_queryset().filter(estado='pagado').count()
+        ctx['pendientes'] = self.get_queryset().filter(estado='Pendiente').count()
         return ctx
 
 
