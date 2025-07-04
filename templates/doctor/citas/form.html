@@ -24,6 +24,16 @@
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     overflow: hidden;
   }
+  .day-habil {
+    background-color: #f0fff4 !important;
+    border-left: 3px solid #48bb78 !important;
+}
+
+.day-no-habil {
+    opacity: 0.7;
+    cursor: not-allowed !important;
+    background-color: #f8fafc !important;
+}
   .calendar-header {
     display: flex;
     justify-content: space-between;
@@ -175,6 +185,7 @@
 
 <!-- ==================== Script ==================== -->
 <script>
+  const horariosBackend = {{ horarios_json|safe }};
   document.addEventListener('DOMContentLoaded', () => {
     /* ------- Variables y datos ------- */
     let currentDate   = new Date();
@@ -182,8 +193,21 @@
     let selectedTime  = null;
 
     const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-    const availableHours = ['09:00','09:30','10:00','10:30','11:00','11:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00'];
-    const events = {}; // Eventos existentes (rellenar desde backend si lo deseas)
+    const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    
+    // Usamos los horarios del backend
+    const horarios = horariosBackend;
+    
+    // Mapeo de días de la semana a índices (0=lunes, 6=domingo)
+    const diaToIndex = {
+        'lunes': 0,
+        'martes': 1,
+        'miercoles': 2,
+        'jueves': 3,
+        'viernes': 4,
+        'sabado': 5,
+        'domingo': 6
+    };
 
     /* ------- Elementos del DOM ------- */
     const monthYearEl   = document.getElementById('currentMonth');
@@ -195,86 +219,174 @@
 
     /* ------- Funciones del calendario ------- */
     function renderCalendar() {
-      const y = currentDate.getFullYear();
-      const m = currentDate.getMonth();
-      monthYearEl.textContent = `${monthNames[m]} ${y}`;
-      calendarDays.innerHTML  = '';
+        const y = currentDate.getFullYear();
+        const m = currentDate.getMonth();
+        monthYearEl.textContent = `${monthNames[m]} ${y}`;
+        calendarDays.innerHTML  = '';
 
-      const firstDay = new Date(y, m, 1);
-      const lastDay  = new Date(y, m + 1, 0);
-      const daysInMonth = lastDay.getDate();
-      let startDay = firstDay.getDay();
-      startDay = startDay === 0 ? 6 : startDay - 1; // Lunes = 0
+        const firstDay = new Date(y, m, 1);
+        const lastDay  = new Date(y, m + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        let startDay = firstDay.getDay();
+        startDay = startDay === 0 ? 6 : startDay - 1; // Lunes = 0
 
-      const allDays = [];
-      const prevLastDay = new Date(y, m, 0);
-      for (let i = startDay - 1; i >= 0; i--) allDays.push({ day: prevLastDay.getDate() - i, other: true });
-      for (let d = 1; d <= daysInMonth; d++) allDays.push({ day: d, other: false });
-      for (let d = 1; allDays.length < 42; d++) allDays.push({ day: d, other: true });
+        const allDays = [];
+        const prevLastDay = new Date(y, m, 0);
+        for (let i = startDay - 1; i >= 0; i--) allDays.push({ day: prevLastDay.getDate() - i, other: true });
+        for (let d = 1; d <= daysInMonth; d++) allDays.push({ day: d, other: false });
+        for (let d = 1; allDays.length < 42; d++) allDays.push({ day: d, other: true });
 
-      allDays.forEach(info => {
-        const cell = document.createElement('div');
-        cell.className = 'day-cell' + (info.other ? ' other-month' : '');
-        const num = document.createElement('div'); num.className = 'day-number'; num.textContent = info.day; cell.appendChild(num);
+        allDays.forEach(info => {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell' + (info.other ? ' other-month' : '');
+            
+            // Verificar si es día hábil
+            if (!info.other) {
+                const fecha = new Date(y, m, info.day);
+                const diaSemanaIndex = fecha.getDay(); // 0=domingo, 1=lunes...
+                const diaSemanaNombre = diasSemana[diaSemanaIndex === 0 ? 6 : diaSemanaIndex - 1];
+                
+                // Buscar si hay horario para este día
+                const tieneHorario = horarios.some(h => h.dia_semana === diaSemanaNombre);
+                
+                if (tieneHorario) {
+                    cell.style.backgroundColor = '#f0fff4'; // Verde claro para días hábiles
+                    cell.style.borderLeft = '3px solid #48bb78'; // Borde verde
+                }
+            }
 
-        if (!info.other) {
-          const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(info.day).padStart(2,'0')}`;
-          if (events[dateStr]) events[dateStr].forEach(ev => {
-            const pill = document.createElement('div'); pill.className = `event ${ev.type}`; pill.textContent = `${ev.time} · ${ev.title}`; cell.appendChild(pill);
-          });
-          cell.addEventListener('click', () => selectDate(info.day));
+            const num = document.createElement('div'); 
+            num.className = 'day-number'; 
+            num.textContent = info.day; 
+            cell.appendChild(num);
+
+            if (!info.other) {
+                const fecha = new Date(y, m, info.day);
+                const diaSemanaIndex = fecha.getDay();
+                const diaSemanaNombre = diasSemana[diaSemanaIndex === 0 ? 6 : diaSemanaIndex - 1];
+                const tieneHorario = horarios.some(h => h.dia_semana === diaSemanaNombre);
+                
+                if (tieneHorario) {
+                    cell.addEventListener('click', () => selectDate(info.day));
+                } else {
+                    cell.style.cursor = 'not-allowed';
+                    cell.style.opacity = '0.7';
+                }
+            }
+            
+            calendarDays.appendChild(cell);
+        });
+    }
+
+    /* ------- Generar horas disponibles según horario ------- */
+    function generarHorasDisponibles(diaSemanaNombre) {
+        const horarioDia = horarios.find(h => h.dia_semana === diaSemanaNombre);
+        if (!horarioDia) return [];
+        
+        const horas = [];
+        const horaInicio = new Date(`2000-01-01T${horarioDia.hora_inicio}`);
+        const horaFin = new Date(`2000-01-01T${horarioDia.hora_fin}`);
+        
+        // Si hay intervalo, lo consideramos
+        const tieneIntervalo = horarioDia.intervalo_desde && horarioDia.intervalo_hasta;
+        let intervaloInicio = tieneIntervalo ? new Date(`2000-01-01T${horarioDia.intervalo_desde}`) : null;
+        let intervaloFin = tieneIntervalo ? new Date(`2000-01-01T${horarioDia.intervalo_hasta}`) : null;
+        
+        // Generar slots de 30 minutos
+        let currentHora = new Date(horaInicio);
+        
+        while (currentHora < horaFin) {
+            const horaStr = currentHora.toTimeString().substring(0, 5);
+            
+            // Saltar intervalo si existe
+            if (tieneIntervalo && currentHora >= intervaloInicio && currentHora < intervaloFin) {
+                currentHora = new Date(intervaloFin);
+                continue;
+            }
+            
+            horas.push(horaStr);
+            currentHora.setMinutes(currentHora.getMinutes() + 30);
         }
-        calendarDays.appendChild(cell);
-      });
+        
+        return horas;
     }
 
     /* ------- Seleccionar fecha/time ------- */
     function selectDate(day) {
-      const y = currentDate.getFullYear();
-      const m = currentDate.getMonth();
-      const chosen = new Date(y, m, day);
-      const today  = new Date(); today.setHours(0,0,0,0);
-      if (chosen < today) { alert('No puedes agendar citas en fechas pasadas'); return; }
-      selectedDate = chosen;
-
-      document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
-      event.target.closest('.day-cell').classList.add('selected');
-
-      showModal();
+        const y = currentDate.getFullYear();
+        const m = currentDate.getMonth();
+        const chosen = new Date(y, m, day);
+        const today  = new Date(); today.setHours(0,0,0,0);
+        
+        if (chosen < today) { 
+            alert('No puedes agendar citas en fechas pasadas'); 
+            return; 
+        }
+        
+        selectedDate = chosen;
+        document.querySelectorAll('.day-cell').forEach(c => c.classList.remove('selected'));
+        event.target.closest('.day-cell').classList.add('selected');
+        showModal();
     }
 
     function showModal() {
-      selectedDateTxt.textContent = selectedDate.toLocaleDateString('es-ES', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-      document.getElementById('modalHiddenDate').value = selectedDate.toISOString().split('T')[0];
-
-      timeSlotsCont.innerHTML = '';
-      availableHours.forEach(h => {
-        const slot = document.createElement('div'); slot.className = 'time-slot'; slot.textContent = h;
-        slot.addEventListener('click', () => selectTime(h, slot)); timeSlotsCont.appendChild(slot);
-      });
-      confirmBtn.disabled = true;
-      modal.style.display = 'flex';
+        const diaSemanaIndex = selectedDate.getDay(); // 0=domingo, 1=lunes...
+        const diaSemanaNombre = diasSemana[diaSemanaIndex === 0 ? 6 : diaSemanaIndex - 1];
+        const horasDisponibles = generarHorasDisponibles(diaSemanaNombre);
+        
+        selectedDateTxt.textContent = selectedDate.toLocaleDateString('es-ES', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        document.getElementById('modalHiddenDate').value = selectedDate.toISOString().split('T')[0];
+        timeSlotsCont.innerHTML = '';
+        
+        if (horasDisponibles.length === 0) {
+            timeSlotsCont.innerHTML = '<p class="text-red-500">No hay horarios disponibles para este día</p>';
+            confirmBtn.disabled = true;
+        } else {
+            horasDisponibles.forEach(h => {
+                const slot = document.createElement('div'); 
+                slot.className = 'time-slot'; 
+                slot.textContent = h;
+                slot.addEventListener('click', () => selectTime(h, slot)); 
+                timeSlotsCont.appendChild(slot);
+            });
+        }
+        
+        modal.style.display = 'flex';
     }
 
+    // El resto de las funciones permanecen igual...
     function closeModal() { modal.style.display = 'none'; selectedTime = null; }
 
     function selectTime(time, el) {
-      document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedTime = time;
-      document.getElementById('modalHiddenTime').value = time;
-      confirmBtn.disabled = false;
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedTime = time;
+        document.getElementById('modalHiddenTime').value = time;
+        confirmBtn.disabled = false;
     }
 
     /* ------- Navegación de meses ------- */
-    document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-    document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
+    document.getElementById('prevMonth').addEventListener('click', () => { 
+        currentDate.setMonth(currentDate.getMonth() - 1); 
+        renderCalendar(); 
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', () => { 
+        currentDate.setMonth(currentDate.getMonth() + 1); 
+        renderCalendar(); 
+    });
 
     /* ------- Cerrar modal al click outside ------- */
     modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
     renderCalendar();
-  });
+});
 </script>
 {% endblock %}
 

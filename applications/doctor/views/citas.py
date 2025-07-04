@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from applications.doctor.forms.citas import CitaMedicaForm
 from applications.core.models import Paciente,Doctor
-from applications.doctor.models import CitaMedica
+from applications.doctor.models import CitaMedica, HorarioAtencion
 from applications.security.components.mixin_crud import CreateViewMixin, DeleteViewMixin, ListViewMixin, \
     PermissionMixin, UpdateViewMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
@@ -61,7 +61,26 @@ class CitaMedicaCreateView(PermissionMixin, CreateViewMixin, CreateView):
         context['title'] = 'Crear Cita Médica'
         context['form'] = self.get_form()
         context['pacientes'] = Paciente.objects.all()
-        context['doctores']=Doctor.objects.all()
+        context['doctores'] = Doctor.objects.all()
+        
+        # Obtener horarios activos y convertirlos a formato útil para el frontend
+        horarios = HorarioAtencion.objects.filter(activo=True)
+        horarios_data = []
+        
+        for horario in HorarioAtencion.objects.filter(activo=True):
+        # Normaliza los nombres de días quitando tildes y convirtiendo a minúsculas
+            dia_semana = horario.dia_semana.lower()
+            dia_semana = dia_semana.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+            
+            horarios_data.append({
+                'dia_semana': dia_semana,  # Ej: "miercoles"
+                'hora_inicio': horario.hora_inicio.strftime('%H:%M'),
+                'hora_fin': horario.hora_fin.strftime('%H:%M'),
+                'intervalo_desde': horario.intervalo_desde.strftime('%H:%M') if horario.intervalo_desde else None,
+                'intervalo_hasta': horario.intervalo_hasta.strftime('%H:%M') if horario.intervalo_hasta else None
+            })
+        
+        context['horarios_json'] = json.dumps(horarios_data)
         return context
 
 class CitaMedicaUpdateView(PermissionMixin, UpdateViewMixin, UpdateView):
