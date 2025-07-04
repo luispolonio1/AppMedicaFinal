@@ -3,277 +3,616 @@
 <title>{% block title %}{{ title }}{% endblock %}</title>
 
 {% block content %}
-<section class="mt-4 bg-white dark:bg-principal">
-  <div class="container mx-auto px-4">
-
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
-      {{ title1 }}
-    </h1>
-
-    <!-- Errores generales -->
-    {% if form.non_field_errors %}
-    <div class="mx-auto max-w-4xl mt-6">
-      <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
-        <div class="flex items-start">
-          <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg mt-0.5"></i>
-          <div class="ml-3">
-            <h3 class="text-red-800 dark:text-red-200 font-semibold">Se encontraron errores en el formulario:</h3>
-            <ul class="list-disc list-inside mt-2 space-y-1 text-red-700 dark:text-red-300">
-              {% for error in form.non_field_errors %}
-              <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- Formulario -->
-    <form method="post" class="space-y-10 py-8">
-      <div class="mx-4 lg:mx-20">
-        <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto shadow-lg border border-sky-100 dark:border-secundario">
-
-          {% csrf_token %}
-
-          <!-- Vista previa del ícono -->
-          <div class="text-center mb-10">
-            <div class="bg-gray-100 dark:bg-principal rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4 shadow">
-              <i id="iconPreview" class="bi bi-x-octagon text-3xl text-sky-600 dark:text-sky-400"></i>
-            </div>
-            <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Vista previa del ícono</h2>
-          </div>
-
-          <!-- Grid de campos (3 columnas) -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Campo Name -->
-            <div class="{% if form.name.errors %}has-error{% endif %}">
-              <label for="{{ form.name.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base block mb-2
-                            {% if form.name.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.name.label }}{% if form.name.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              {{ form.name }}
-              {% for error in form.name.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white dark:bg-secundario rounded-2xl shadow-xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-blue-500 dark:bg-sky-700 px-8 py-6">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/20 rounded-full p-3">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-white uppercase">{{ title1 }}</h1>
+                </div>
             </div>
 
-            <!-- Campo URL -->
-            <div class="{% if form.url.errors %}has-error{% endif %}">
-              <label for="{{ form.url.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base block mb-2
-                            {% if form.url.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.url.label }}{% if form.url.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              {{ form.url }}
-              {% for error in form.url.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
-            </div>
+            <style>
+            /* Estilos para los campos del formulario */
+            input[type="text"], 
+            input[type="email"], 
+            input[type="number"], 
+            input[type="date"], 
+            input[type="datetime-local"],
+            input[type="tel"],
+            input[type="url"],
+            textarea,
+            select {
+                width: 100% !important;
+                padding: 12px 16px !important;
+                border: 2px solid #d1d5db !important;
+                border-radius: 8px !important;
+                font-size: 14px !important;
+                line-height: 1.5 !important;
+                background-color: #ffffff !important;
+                transition: all 0.2s ease-in-out !important;
+                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+            }
 
-                        <!-- Campo Permissions -->
-                        <div class="field-container {% if form.permissions.errors %}has-error{% endif %}">
-                            <label for="{{ form.permissions.id_for_label }}"
-                                class="font-black uppercase text-lg block mb-2
-                                       {% if form.permissions.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
-                                {{ form.permissions.label }}
-                                {% if form.permissions.field.required %}<span class="text-red-500">*</span>{% endif %}
+            /* Dark mode styles */
+            .dark input[type="text"], 
+            .dark input[type="email"], 
+            .dark input[type="number"], 
+            .dark input[type="date"], 
+            .dark input[type="datetime-local"],
+            .dark input[type="tel"],
+            .dark input[type="url"],
+            .dark textarea,
+            .dark select {
+                background-color: #374151 !important;
+                border-color: #4b5563 !important;
+                color: #f3f4f6 !important;
+            }
+
+            /* Hover states */
+            input[type="text"]:hover, 
+            input[type="email"]:hover, 
+            input[type="number"]:hover, 
+            input[type="date"]:hover, 
+            input[type="datetime-local"]:hover,
+            input[type="tel"]:hover,
+            input[type="url"]:hover,
+            textarea:hover,
+            select:hover {
+                border-color: #0ea5e9 !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+            }
+
+            /* Focus states */
+            input[type="text"]:focus, 
+            input[type="email"]:focus, 
+            input[type="number"]:focus, 
+            input[type="date"]:focus, 
+            input[type="datetime-local"]:focus,
+            input[type="tel"]:focus,
+            input[type="url"]:focus,
+            textarea:focus,
+            select:focus {
+                outline: none !important;
+                border-color: #0ea5e9 !important;
+                box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+            }
+
+            /* Vista previa del ícono */
+            .icon-preview {
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                border: 2px solid #e2e8f0;
+            }
+
+            .dark .icon-preview {
+                background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+                border: 2px solid #4b5563;
+            }
+
+            /* Checkbox styling */
+            input[type="checkbox"] {
+                width: 20px !important;
+                height: 20px !important;
+                accent-color: #0ea5e9 !important;
+                border: 2px solid #d1d5db !important;
+                border-radius: 4px !important;
+                cursor: pointer !important;
+            }
+
+            input[type="checkbox"]:focus {
+                outline: none !important;
+                box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important;
+            }
+
+            /* Textarea específico */
+            textarea {
+                min-height: 100px !important;
+                resize: vertical !important;
+            }
+
+            /* Select styling */
+            select {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%230ea5e9' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e") !important;
+                background-position: right 12px center !important;
+                background-repeat: no-repeat !important;
+                background-size: 16px 16px !important;
+                padding-right: 40px !important;
+                appearance: none !important;
+                cursor: pointer !important;
+            }
+
+            /* Multi-select para permisos */
+            select[multiple] {
+                background-image: none !important;
+                padding-right: 16px !important;
+                min-height: 200px !important;
+                cursor: pointer !important;
+            }
+
+            select[multiple] option {
+                padding: 8px 12px !important;
+                border-radius: 4px !important;
+                margin: 2px 0 !important;
+            }
+
+            select[multiple] option:hover {
+                background-color: #e0f2fe !important;
+            }
+
+            .dark select[multiple] option:hover {
+                background-color: #1e3a8a !important;
+            }
+
+            /* Placeholder styling */
+            input::placeholder,
+            textarea::placeholder {
+                color: #9ca3af !important;
+                opacity: 1 !important;
+            }
+
+            .dark input::placeholder,
+            .dark textarea::placeholder {
+                color: #6b7280 !important;
+            }
+
+            /* Error states */
+            .has-error input,
+            .has-error textarea,
+            .has-error select {
+                border-color: #dc2626 !important;
+                background-color: rgba(254, 242, 242, 0.5) !important;
+            }
+
+            .has-error input:focus,
+            .has-error textarea:focus,
+            .has-error select:focus {
+                box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+            }
+
+            .dark .has-error input,
+            .dark .has-error textarea,
+            .dark .has-error select {
+                background-color: rgba(153, 27, 27, 0.2) !important;
+                color: #fca5a5 !important;
+            }
+
+            /* Label styling */
+            .field-container label {
+                display: block !important;
+                margin-bottom: 8px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                font-size: 14px !important;
+                color: #374151 !important;
+                letter-spacing: 0.025em !important;
+            }
+
+            .dark .field-container label {
+                color: #e5e7eb !important;
+            }
+
+            .has-error label {
+                color: #dc2626 !important;
+            }
+
+            .dark .has-error label {
+                color: #f87171 !important;
+            }
+
+            /* Animación de error */
+            .has-error {
+                animation: shake 0.5s ease-in-out;
+            }
+
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+                20%, 40%, 60%, 80% { transform: translateX(2px); }
+            }
+
+            /* Botones de permisos */
+            .permission-btn {
+                transition: all 0.2s ease-in-out;
+                transform: scale(1);
+            }
+
+            .permission-btn:hover {
+                transform: scale(1.05);
+            }
+
+            .permission-btn:active {
+                transform: scale(0.95);
+            }
+
+            /* Botones principales */
+            .primary-btn {
+                background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+                box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            }
+
+            .primary-btn:hover {
+                background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+                box-shadow: 0 6px 16px rgba(14, 165, 233, 0.4);
+            }
+
+            .secondary-btn {
+                background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+            }
+
+            .secondary-btn:hover {
+                background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+                box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+            }
+            </style>
+
+            <div class="p-8">
+                <!-- Error Messages -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 rounded-r-lg mb-6">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                            </svg>
+                            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Se encontraron errores en el formulario:</h3>
+                        </div>
+                        <ul class="mt-2 text-sm text-red-700 dark:text-red-300 space-y-1">
+                            {% for error in form.non_field_errors %}
+                                <li class="flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5"></i>
+                                    <span>{{ error }}</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <form method="post" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Vista previa del ícono -->
+                    <div class="text-center mb-8">
+                        <div class="icon-preview rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-4 shadow-lg">
+                            <i id="iconPreview" class="bi bi-x-octagon text-3xl text-sky-600 dark:text-sky-400"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Vista previa del ícono</h2>
+                    </div>
+                    
+                    <!-- Campos principales en grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Campo Name -->
+                        <div class="field-container {% if form.name.errors %}has-error{% endif %}">
+                            <label for="{{ form.name.id_for_label }}" 
+                                   class="block text-sm font-medium mb-2 {% if form.name.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.name.label }}
+                                {% if form.name.field.required %}
+                                    <span class="text-red-500 ml-1">*</span>
+                                {% endif %}
                             </label>
-                            <div class="relative {% if form.permissions.errors %}border-2 border-red-300 dark:border-red-600 rounded-lg p-2 bg-red-50 dark:bg-red-900/20{% endif %}">
-                                {{ form.permissions }}
-                                {% if form.permissions.errors %}
-                                <div class="absolute top-2 right-2 pointer-events-none">
-                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
-                                </div>
+                            
+                            <div class="relative">
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
                                 {% endif %}
                             </div>
-                            {% if form.permissions.errors %}
-                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
-                                {% for error in form.permissions.errors %}
-                                <div class="flex items-center mt-1">
-                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
-                                    {{ error }}
+                            
+                            {% for error in form.name.errors %}
+                                <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                    <span>{{ error }}</span>
                                 </div>
-                                {% endfor %}
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campo URL -->
+                        <div class="field-container {% if form.url.errors %}has-error{% endif %}">
+                            <label for="{{ form.url.id_for_label }}" 
+                                   class="block text-sm font-medium mb-2 {% if form.url.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.url.label }}
+                                {% if form.url.field.required %}
+                                    <span class="text-red-500 ml-1">*</span>
+                                {% endif %}
+                            </label>
+                            
+                            <div class="relative">
+                                {{ form.url }}
+                                {% if form.url.errors %}
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+                                {% endif %}
                             </div>
-                            {% endif %}
+                            
+                            {% for error in form.url.errors %}
+                                <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campo Menu -->
+                        <div class="field-container {% if form.menu.errors %}has-error{% endif %}">
+                            <label for="{{ form.menu.id_for_label }}" 
+                                   class="block text-sm font-medium mb-2 {% if form.menu.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.menu.label }}
+                                {% if form.menu.field.required %}
+                                    <span class="text-red-500 ml-1">*</span>
+                                {% endif %}
+                            </label>
+                            
+                            <div class="relative">
+                                {{ form.menu }}
+                                {% if form.menu.errors %}
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+                                {% endif %}
+                            </div>
+                            
+                            {% for error in form.menu.errors %}
+                                <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campo Icon -->
+                        <div class="field-container {% if form.icon.errors %}has-error{% endif %}">
+                            <label for="{{ form.icon.id_for_label }}" 
+                                   class="block text-sm font-medium mb-2 {% if form.icon.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.icon.label }}
+                                {% if form.icon.field.required %}
+                                    <span class="text-red-500 ml-1">*</span>
+                                {% endif %}
+                            </label>
+                            
+                            <div class="relative">
+                                {{ form.icon }}
+                                {% if form.icon.errors %}
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+                                {% endif %}
+                            </div>
+                            
+                            {% for error in form.icon.errors %}
+                                <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campo Order -->
+                        <div class="field-container {% if form.order.errors %}has-error{% endif %}">
+                            <label for="{{ form.order.id_for_label }}" 
+                                   class="block text-sm font-medium mb-2 {% if form.order.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.order.label }}
+                                {% if form.order.field.required %}
+                                    <span class="text-red-500 ml-1">*</span>
+                                {% endif %}
+                            </label>
+                            
+                            <div class="relative">
+                                {{ form.order }}
+                                {% if form.order.errors %}
+                                    <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none"></i>
+                                {% endif %}
+                            </div>
+                            
+                            {% for error in form.order.errors %}
+                                <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                    <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                    <span>{{ error }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Campo Is Active -->
+                        <div class="field-container {% if form.is_active.errors %}has-error{% endif %} flex items-center space-x-3">
+                            {{ form.is_active }}
+                            <label for="{{ form.is_active.id_for_label }}" 
+                                   class="text-sm font-medium {% if form.is_active.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                                {{ form.is_active.label }}
+                            </label>
                         </div>
                     </div>
-            <!-- Campo Menu -->
-            <div class="{% if form.menu.errors %}has-error{% endif %}">
-              <label for="{{ form.menu.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base block mb-2
-                            {% if form.menu.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.menu.label }}{% if form.menu.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              {{ form.menu }}
-              {% for error in form.menu.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
+
+                    <!-- Campo Description -->
+                    <div class="field-container {% if form.description.errors %}has-error{% endif %}">
+                        <label for="{{ form.description.id_for_label }}" 
+                               class="block text-sm font-medium mb-2 {% if form.description.errors %}text-red-600 dark:text-red-400{% else %}text-gray-700 dark:text-gray-300{% endif %}">
+                            {{ form.description.label }}
+                            {% if form.description.field.required %}
+                                <span class="text-red-500 ml-1">*</span>
+                            {% endif %}
+                        </label>
+                        
+                        <div class="relative">
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <i class="fa-solid fa-exclamation-circle text-red-500 absolute right-3 top-3 pointer-events-none"></i>
+                            {% endif %}
+                        </div>
+                        
+                        {% for error in form.description.errors %}
+                            <div class="text-red-600 dark:text-red-400 text-sm mt-1 flex items-start">
+                                <i class="fa-solid fa-circle-exclamation mr-2 mt-0.5 text-xs"></i>
+                                <span>{{ error }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Sección de Permisos -->
+                    <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
+                            <i class="fa-solid fa-shield-halved mr-2 text-sky-600"></i>
+                            Gestión de Permisos
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Permisos Disponibles -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                                    Permisos Disponibles
+                                </label>
+                                <select id="available_permissions" multiple 
+                                        class="w-full border rounded-lg p-3 dark:bg-gray-800 dark:text-white min-h-[200px] focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                                </select>
+                            </div>
+                            
+                            <!-- Permisos Asignados -->
+                            <div>
+                                <label class="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                                    Permisos Asignados
+                                </label>
+                                <select id="assigned_permissions" name="permissions" multiple 
+                                        class="w-full border rounded-lg p-3 dark:bg-gray-800 dark:text-white min-h-[200px] focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Botones de transferencia -->
+                        <div class="flex justify-center space-x-4 mt-6">
+                            <button type="button" id="add_permission" 
+                                    class="permission-btn px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span>Asignar</span>
+                            </button>
+                            <button type="button" id="remove_permission" 
+                                    class="permission-btn px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-left"></i>
+                                <span>Remover</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col sm:flex-row sm:justify-center sm:items-center space-y-3 sm:space-y-0 sm:space-x-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                        <button type="submit" 
+                                class="primary-btn inline-flex items-center justify-center px-8 py-3 border border-transparent text-white font-medium rounded-lg transition-all duration-200">
+                            <i class="fa-solid fa-save mr-2"></i>
+                            Guardar Módulo
+                        </button>
+                        
+                        <a href="{% url 'security:module_list' %}" 
+                           class="secondary-btn inline-flex items-center justify-center px-8 py-3 border border-transparent text-white font-medium rounded-lg transition-all duration-200">
+                            <i class="fa-solid fa-xmark mr-2"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
             </div>
-
-            <!-- Campo Icon -->
-            <div class="{% if form.icon.errors %}has-error{% endif %}">
-              <label for="{{ form.icon.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base block mb-2
-                            {% if form.icon.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.icon.label }}{% if form.icon.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              {{ form.icon }}
-              {% for error in form.icon.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- Campo Order -->
-            <div class="{% if form.order.errors %}has-error{% endif %}">
-              <label for="{{ form.order.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base block mb-2
-                            {% if form.order.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.order.label }}{% if form.order.field.required %}<span class="text-red-500">*</span>{% endif %}
-              </label>
-              {{ form.order }}
-              {% for error in form.order.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
-            </div>
-
-            <!-- Campo Is Active -->
-            <div class="{% if form.is_active.errors %}has-error{% endif %} flex items-center space-x-3 mt-6 md:mt-0">
-              {{ form.is_active }}
-              <label for="{{ form.is_active.id_for_label }}"
-                     class="font-black uppercase text-sm md:text-base
-                            {% if form.is_active.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.is_active.label }}
-              </label>
-            </div>
-          </div>
-
-          <!-- Descripción -->
-          <div class="mt-10">
-            <label for="{{ form.description.id_for_label }}"
-                   class="font-black uppercase text-sm md:text-base block mb-2
-                          {% if form.description.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-              {{ form.description.label }}
-            </label>
-            {{ form.description }}
-            {% for error in form.description.errors %}
-            <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Permisos -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
-            <div>
-              <label class="block text-sm md:text-base font-black uppercase mb-2 text-gray-600 dark:text-gray-300">
-                Permisos disponibles
-              </label>
-              <select id="available_permissions" multiple class="w-full h-56 border rounded p-2 dark:bg-gray-800 dark:text-white"></select>
-            </div>
-            <div>
-              <label class="block text-sm md:text-base font-black uppercase mb-2 text-gray-600 dark:text-gray-300">
-                Permisos asignados
-              </label>
-              <select id="assigned_permissions" name="permissions" multiple class="w-full h-56 border rounded p-2 dark:bg-gray-800 dark:text-white"></select>
-            </div>
-          </div>
-
-          <!-- Botones mover -->
-          <div class="flex justify-center space-x-6 my-6">
-            <button type="button" id="add_permission" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-full shadow">
-              →
-            </button>
-            <button type="button" id="remove_permission" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow">
-              ←
-            </button>
-          </div>
-
-          <!-- Botones acción -->
-          <div class="flex flex-col md:flex-row justify-center items-center mt-12 space-y-3 md:space-y-0 md:space-x-8">
-            <button type="submit"
-                    class="w-full md:w-auto bg-sky-600 hover:bg-sky-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-              <i class="fa-solid fa-save mr-2"></i>Guardar Módulo
-            </button>
-            <a href="{% url 'security:module_list' %}"
-               class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-              <i class="fa-solid fa-xmark mr-2"></i>Cancelar
-            </a>
-          </div>
-
         </div>
-      </div>
-    </form>
-  </div>
-</section>
-
-<!-- Estilos de error (se mantienen) -->
-<style>
-.field-container.has-error input,
-.field-container.has-error select,
-.field-container.has-error textarea {
-  border-color: #ef4444 !important;
-  background-color: rgba(254,242,242,.5) !important;
-  color: #991b1b !important;
-}
-@media (prefers-color-scheme: dark) {
-  .field-container.has-error input,
-  .field-container.has-error select,
-  .field-container.has-error textarea {
-    background-color: rgba(153,27,27,.2) !important;
-    color: #fca5a5 !important;
-    border-color: #ef4444 !important;
-  }
-}
-.field-container.has-error { animation: shake .5s ease-in-out; }
-@keyframes shake { 0%,100%{transform:translateX(0)} 10%,30%,50%,70%,90%{transform:translateX(-2px)} 20%,40%,60%,80%{transform:translateX(2px)} }
-</style>
+    </div>
+</div>
 
 <script>
-// Vista previa ícono
-document.addEventListener('DOMContentLoaded', () => {
-  const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
-  const iconPreview = document.getElementById('iconPreview');
-  const updatePreview = () => {
-    const cls = iconInput.value.trim();
-    iconPreview.className = cls ? `${cls} text-3xl text-sky-600 dark:text-sky-400` : 'bi bi-x-octagon text-3xl text-gray-400';
-  };
-  updatePreview();
-  ['input','keyup','change'].forEach(e => iconInput.addEventListener(e, updatePreview));
-});
-
-
-// Permisos
-document.addEventListener('DOMContentLoaded', () => {
-  const moduleId = '{{ form.instance.pk|default_if_none:"" }}';
-  const avail = document.getElementById('available_permissions');
-  const assigned = document.getElementById('assigned_permissions');
-  const assignedSet = new Set();
-
-  const loadAssigned = () => moduleId
-    ? fetch(`/security/get-permissions/${moduleId}/`).then(r=>r.json()).then(d=>d.forEach(p=>assignedSet.add(p.id)))
-    : Promise.resolve();
-
-  const loadAll = () => fetch('/security/get-all-permissions/')
-    .then(r=>r.json())
-    .then(data=>{
-      avail.innerHTML = assigned.innerHTML = '';
-      data.forEach(p=>{
-        const opt = new Option(`${p.name} (${p.codename})`, p.id);
-        (assignedSet.has(p.id)?assigned:avail).add(opt);
-      });
+document.addEventListener('DOMContentLoaded', function() {
+    // Vista previa del ícono
+    const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
+    const iconPreview = document.getElementById('iconPreview');
+    
+    const updateIconPreview = () => {
+        const iconClass = iconInput.value.trim();
+        iconPreview.className = iconClass 
+            ? `${iconClass} text-3xl text-sky-600 dark:text-sky-400` 
+            : 'bi bi-x-octagon text-3xl text-gray-400';
+    };
+    
+    updateIconPreview();
+    ['input', 'keyup', 'change'].forEach(event => {
+        iconInput.addEventListener(event, updateIconPreview);
     });
 
-  loadAssigned().then(loadAll);
+    // Gestión de permisos
+    const moduleId = '{{ form.instance.pk|default_if_none:"" }}';
+    const availablePerms = document.getElementById('available_permissions');
+    const assignedPerms = document.getElementById('assigned_permissions');
+    const assignedSet = new Set();
 
-  document.getElementById('add_permission').onclick = () => {
-    [...avail.selectedOptions].forEach(o=>assigned.add(o));
-  };
-  document.getElementById('remove_permission').onclick = () => {
-    [...assigned.selectedOptions].forEach(o=>avail.add(o));
-  };
+    // Cargar permisos asignados
+    const loadAssignedPermissions = () => {
+        if (moduleId) {
+            return fetch(`/security/get-permissions/${moduleId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(permission => assignedSet.add(permission.id));
+                });
+        }
+        return Promise.resolve();
+    };
+
+    // Cargar todos los permisos
+    const loadAllPermissions = () => {
+        return fetch('/security/get-all-permissions/')
+            .then(response => response.json())
+            .then(data => {
+                availablePerms.innerHTML = '';
+                assignedPerms.innerHTML = '';
+                
+                data.forEach(permission => {
+                    const option = new Option(
+                        `${permission.name} (${permission.codename})`, 
+                        permission.id
+                    );
+                    
+                    if (assignedSet.has(permission.id)) {
+                        assignedPerms.add(option);
+                    } else {
+                        availablePerms.add(option);
+                    }
+                });
+            });
+    };
+
+    // Inicializar permisos
+    loadAssignedPermissions().then(loadAllPermissions);
+
+    // Botones de transferencia
+    document.getElementById('add_permission').addEventListener('click', () => {
+        const selectedOptions = [...availablePerms.selectedOptions];
+        selectedOptions.forEach(option => {
+            assignedPerms.add(option);
+        });
+    });
+
+    document.getElementById('remove_permission').addEventListener('click', () => {
+        const selectedOptions = [...assignedPerms.selectedOptions];
+        selectedOptions.forEach(option => {
+            availablePerms.add(option);
+        });
+    });
+
+    // Animación suave al hacer scroll
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    });
+
+    // Mejorar la experiencia de validación
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const fieldContainer = this.closest('.field-container');
+            if (fieldContainer && fieldContainer.classList.contains('has-error')) {
+                // Opcional: remover clase de error al empezar a escribir
+                // fieldContainer.classList.remove('has-error');
+            }
+        });
+    });
+
+    // Seleccionar todos los permisos asignados antes de enviar
+    document.querySelector('form').addEventListener('submit', function() {
+        const assignedOptions = assignedPerms.querySelectorAll('option');
+        assignedOptions.forEach(option => {
+            option.selected = true;
+        });
+    });
 });
-
 </script>
 {% endblock %}

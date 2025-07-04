@@ -5,154 +5,478 @@
 {% block content %}
 {% include 'fragments/messages.html' %}
 
-<section class="mt-4 bg-white dark:bg-principal">
-  <div class="container mx-auto px-4">
+<style>
+/* Estilos personalizados para la lista de usuarios */
+.user-card {
+    transition: all 0.3s ease;
+    border: 1px solid #d7dadc;
+    background-color: white;
+}
 
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
-      {{ title1 }}
-    </h1>
+.user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #c4c7ca;
+}
 
-    <!-- Buscador -->
-    <div class="mt-6 flex justify-center">
-      <form method="get" class="relative w-full max-w-lg">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
-        <input
-          type="text"
-          name="q"
-          placeholder="Buscar usuarios…"
-          value="{{ request.GET.q }}"
-          class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
-                 focus:outline-none focus:ring-2 focus:ring-sky-500
-                 bg-white text-gray-800 dark:bg-principal dark:text-gray-200"
-        >
-      </form>
-    </div>
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
 
-    <!-- Tabla -->
-    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
-      <table class="w-full text-center text-sm md:text-base">
-        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
-          <tr>
-            <th class="py-3 px-4">ID</th>
-            <th class="py-3 px-4">Username</th>
-            <th class="py-3 px-4">Email</th>
-            <th class="py-3 px-4">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario
-                     hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300
-                     text-gray-600 dark:text-gray-400">
-            <td class="py-4 px-4">{{ user.id }}</td>
-            <td class="py-4 px-4">{{ user.username }}</td>
-            <td class="py-4 px-4">{{ user.email }}</td>
-            <td class="py-4 px-4">
-              {% if permissions.change_user %}
-              <a href="{% url 'security:user_update' user.id %}"
-                 class="text-sky-500 hover:text-sky-700 mx-1 transition-colors duration-200">
-                <i class="fa-solid fa-edit text-lg"></i>
-              </a>
-              {% endif %}
-              {% if permissions.delete_user %}
-              <a href="#"
-                 class="text-red-600 hover:text-red-800 mx-1 transition-colors duration-200"
-                 onclick="openDeleteModal('{{ user.id }}', '{{ user.username }}')">
-                <i class="fa-solid fa-trash text-lg"></i>
-              </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+.status-active {
+    background-color: rgba(12, 93, 169, 0.1);
+    color: #0c5da9;
+}
 
-    <!-- Paginación -->
-    <div class="flex justify-center mt-6">
-      <nav aria-label="Page navigation">
-        <ul class="inline-flex -space-x-px">
-          {% if page_obj.has_previous %}
-          <li>
-            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg
-                      hover:bg-sky-50 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">
-              Anterior
+.status-inactive {
+    background-color: rgba(215, 218, 220, 0.5);
+    color: #6b7280;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 40px;
+    transition: all 0.2s ease;
+    border-color: #d7dadc;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(12, 93, 169, 0.1);
+    border-color: #0c5da9;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: 1px solid #d7dadc;
+    background-color: white;
+    color: #374151;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #b5b9bd;
+}
+
+.pagination-btn.active {
+    background-color: #0c5da9;
+    border-color: #0c5da9;
+    color: white;
+}
+
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.btn-edit {
+    background-color: rgba(215, 218, 220, 0.5);
+    color: #4b5563;
+}
+
+.btn-edit:hover {
+    background-color: rgba(215, 218, 220, 0.7);
+}
+
+.btn-delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border: 1px solid #d7dadc;
+}
+
+.user-badge {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.email-badge {
+    background-color: rgba(12, 93, 169, 0.1);
+    color: #0c5da9;
+}
+
+@media (max-width: 768px) {
+    .user-card {
+        margin-bottom: 1rem;
+    }
+    
+    .hidden-mobile {
+        display: none;
+    }
+}
+</style>
+
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200">
+            <div class="bg-blue-500 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white/20 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl text-white font-black">{{ title1 }}</h1>
+                            <p class="text-gray-900 text-sm">Administra los usuarios del sistema</p>
+                        </div>
+                    </div>
+                    {% if permissions.add_menu %}
+                    <a href="{% url 'security:user_create' %}" class="inline-flex items-center px-4 py-2 bg-white text-blue-800 font-semibold rounded-lg shadow hover:bg-blue-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nuevo Usuario
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Usuarios</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ page_obj.paginator.count|default:users|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Activos</p>
+                                <p class="text-2xl font-bold text-green-600">{{ users|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Permisos</p>
+                                <p class="text-2xl font-bold text-blue-800">-</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-blue-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Página</p>
+                                <p class="text-2xl font-bold text-blue-800">{{ page_obj.number|default:1 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Búsqueda -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-200">
+            <div class="search-container max-w-md mx-auto">
+                <form method="get" class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="Buscar usuarios por nombre o email..."
+                        value="{{ request.GET.q }}"
+                        class="search-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                </form>
+            </div>
+        </div>
+        
+        <!-- Lista de usuarios -->
+        <div class="space-y-4">
+            {% if users %}
+                {% for user in users %}
+                <div class="user-card bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" 
+                     data-username="{{ user.username|lower }}" 
+                     data-email="{{ user.email|lower }}">
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <!-- Avatar del usuario -->
+                                <div class="flex-shrink-0">
+                                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+                                        <span class="text-white font-bold text-lg">
+                                            {{ user.username.0|upper }}{{ user.email.0|upper }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Información del usuario -->
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <h3 class="text-lg font-semibold text-gray-900">
+                                            {{ user.username }}
+                                        </h3>
+                                        <span class="status-badge status-active">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Activo
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="mt-1 text-sm text-gray-600">
+                                        <p><strong>ID:</strong> {{ user.id }}</p>
+                                        <p><strong>Email:</strong> {{ user.email }}</p>
+                                    </div>
+                                    
+                                    <div class="mt-2 flex items-center space-x-4 text-sm">
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium user-badge">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                            </svg>
+                                            Usuario
+                                        </span>
+                                        
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium email-badge">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                            </svg>
+                                            Email verificado
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones -->
+                            <div class="flex items-center space-x-2">
+                                {% if permissions.change_user %}
+                                <a href="{% url 'security:user_update' user.id %}" 
+                                   class="action-btn btn-edit" 
+                                   title="Editar usuario">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                                
+                                {% if permissions.delete_user %}
+                                <button class="action-btn btn-delete" 
+                                        onclick="openDeleteModal('{{ user.id }}', '{{ user.username }}')"
+                                        title="Eliminar usuario">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Estado vacío -->
+                <div class="empty-state bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay usuarios registrados</h3>
+                        <p class="mt-1 text-sm text-gray-500">Comienza creando tu primer usuario.</p>
+                        <div class="mt-6">
+                            {% if permissions.add_menu %}
+                            <a href="{% url 'security:user_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-800 hover:bg-blue-700">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Crear Usuario
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Paginación -->
+        <div class="bg-white rounded-xl shadow-lg px-4 py-3 mt-8 border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn rounded-l-md">
+                            Anterior
+                        </a>
+                    {% endif %}
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn rounded-r-md">
+                            Siguiente
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Mostrando
+                            <span class="font-medium">{{ page_obj.start_index }}</span>
+                            a
+                            <span class="font-medium">{{ page_obj.end_index }}</span>
+                            de
+                            <span class="font-medium">{{ page_obj.paginator.count }}</span>
+                            resultados
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1" class="pagination-btn rounded-l-md">Primera</a>
+                                <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">Anterior</a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span class="pagination-btn active">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">Siguiente</a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-btn rounded-r-md">Última</a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botones de navegación -->
+        <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
+            <a href="{% url 'security:permission_dashboard' %}" class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+              <i class="fa-solid fa-backward-step mr-2"></i>
+                Atrás
             </a>
-          </li>
-          {% endif %}
-
-          {% for num in page_obj.paginator.page_range %}
-          <li>
-            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight
-                      {% if num == page_obj.number %}
-                        text-sky-700 bg-sky-100 border border-gray-300
-                        dark:bg-secundario dark:border-principal dark:text-sky-300
-                      {% else %}
-                        text-gray-500 bg-white border border-gray-300 hover:bg-sky-50 hover:text-gray-700
-                        dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white
-                      {% endif %}">
-              {{ num }}
+            <a href="{% url 'home' %}" class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Inicio
             </a>
-          </li>
-          {% endfor %}
-
-          {% if page_obj.has_next %}
-          <li>
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg
-                      hover:bg-sky-50 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">
-              Siguiente
-            </a>
-          </li>
-          {% endif %}
-        </ul>
-      </nav>
+        </div>
     </div>
-
-    <!-- Botones/Enlaces -->
-    <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
-      <a href="{% url 'security:permission_dashboard' %}"
-          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-          <i class="fa-solid fa-backward-step"></i> atras
-      </a>
-      {% if permissions.add_menu %}
-      <a href="{% url 'security:user_create' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nuevo Usuario
-      </a>
-      {% endif %}
-      <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-         <i class="fa-solid fa-house"></i> Inicio
-  </div>
-  </div>
-</section>
+</div>
 
 {% include 'fragments/delete.html' %}
+
 <script>
 function openDeleteModal(id, name) {
-  const deleteForm = document.getElementById('deleteForm');
-  deleteForm.action = "{% url 'security:menu_delete' 0 %}".replace('0', id);
-  document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
-  document.getElementById('deleteModal').classList.remove('hidden');
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = "{% url 'security:menu_delete' 0 %}".replace('0', id);
+    document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
+
 function closeModal() {
-  document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
 }
-document.addEventListener('DOMContentLoaded', () => {
-  const deleteForm = document.getElementById('deleteForm');
-  if (deleteForm) {
-    deleteForm.addEventListener('submit', () => {
-      const btn = deleteForm.querySelector('button[type="submit"]');
-      if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando…';
-        btn.disabled = true;
-      }
-    });
-  }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Funcionalidad de eliminación
+    const deleteForm = document.getElementById('deleteForm');
+    if (deleteForm) {
+        deleteForm.addEventListener('submit', () => {
+            const btn = deleteForm.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.innerHTML = '<svg class="w-4 h-4 animate-spin mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Eliminando…';
+                btn.disabled = true;
+            }
+        });
+    }
+    
+    // Funcionalidad de búsqueda en tiempo real
+    const searchInput = document.querySelector('input[name="q"]');
+    const userCards = document.querySelectorAll('.user-card');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            userCards.forEach(card => {
+                const username = card.getAttribute('data-username') || '';
+                const email = card.getAttribute('data-email') || '';
+                
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
 });
 </script>
 {% endblock %}

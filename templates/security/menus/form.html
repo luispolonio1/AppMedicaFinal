@@ -6,17 +6,17 @@
 <section class="mt-4 bg-white dark:bg-principal">
   <div class="container mx-auto px-4">
 
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
+    <!-- Título -->
+    <h1 class="text-3xl md:text-4xl font-bold text-white bg-blue-500 y-3 px-6 rounded-xl shadow-lg text-center uppercase">
       {{ title1 }}
     </h1>
 
-    <!-- Errores generales -->
+    <!-- Errores generales -->
     {% if form.non_field_errors %}
     <div class="mx-auto max-w-4xl mt-6">
       <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
         <div class="flex items-start">
-          <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg mt-0.5"></i>
+          <i class="fa-solid fa-exclamation-triangle text-red-500 text-lg mt-0.5" aria-hidden="true"></i>
           <div class="ml-3">
             <h3 class="text-red-800 dark:text-red-200 font-semibold">Se encontraron errores en el formulario:</h3>
             <ul class="list-disc list-inside mt-2 space-y-1 text-red-700 dark:text-red-300">
@@ -30,70 +30,120 @@
     </div>
     {% endif %}
 
-    <form method="post" class="space-y-10 py-8">
+    <form method="post" class="space-y-10 py-8" novalidate>
       <div class="mx-4 lg:mx-20">
         <div class="bg-white dark:bg-secundario rounded-3xl p-8 max-w-4xl mx-auto shadow-lg border border-sky-100 dark:border-secundario">
 
           {% csrf_token %}
 
-          <!-- Vista previa del ícono -->
+          <!-- Vista previa del ícono -->
           <div class="text-center mb-10">
-            <div class="bg-gray-100 dark:bg-principal rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4 shadow">
-              <i id="iconPreview" class="bi bi-x-octagon text-3xl text-sky-600 dark:text-sky-400"></i>
+            <div class="bg-gray-100 dark:bg-principal rounded-full w-24 h-24 mx-auto flex items-center justify-center mb-4 shadow-md transition-all duration-300">
+              <i id="iconPreview" class="bi bi-x-octagon text-3xl text-sky-600 dark:text-sky-400 transition-all duration-300" aria-hidden="true"></i>
             </div>
             <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-300">Vista previa del ícono</h2>
           </div>
 
-          <!-- Campos -->
+          <!-- Campos -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            <!-- Nombre -->
-            <div class="{% if form.name.errors %}has-error{% endif %}">
+            <!-- Nombre -->
+            <div class="field-container {% if form.name.errors %}has-error{% endif %}">
               <label for="{{ form.name.id_for_label }}" class="font-black uppercase text-sm md:text-base block mb-2
                      {% if form.name.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.name.label }}{% if form.name.field.required %}<span class="text-red-500">*</span>{% endif %}
+                {{ form.name.label }}{% if form.name.field.required %}<span class="text-red-500" aria-label="Campo requerido">*</span>{% endif %}
               </label>
-              {{ form.name }}
-              {% for error in form.name.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
+              <div class="relative">
+                {{ form.name }}
+                {% if form.name.errors %}
+                <div class="absolute top-2 right-2 pointer-events-none">
+                  <i class="fa-solid fa-exclamation-circle text-red-500" aria-hidden="true"></i>
+                </div>
+                {% endif %}
+              </div>
+              {% if form.name.errors %}
+              <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                {% for error in form.name.errors %}
+                <div class="flex items-center mt-1">
+                  <i class="fa-solid fa-circle-exclamation text-xs mr-2" aria-hidden="true"></i>
+                  {{ error }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
             </div>
 
-            <!-- Icono -->
-            <div class="{% if form.icon.errors %}has-error{% endif %}">
+            <!-- Icono -->
+            <div class="field-container {% if form.icon.errors %}has-error{% endif %}">
               <label for="{{ form.icon.id_for_label }}" class="font-black uppercase text-sm md:text-base block mb-2
                      {% if form.icon.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.icon.label }}{% if form.icon.field.required %}<span class="text-red-500">*</span>{% endif %}
+                {{ form.icon.label }}{% if form.icon.field.required %}<span class="text-red-500" aria-label="Campo requerido">*</span>{% endif %}
               </label>
-              {{ form.icon }}
-              {% for error in form.icon.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
+              <div class="relative">
+                {{ form.icon }}
+                {% if form.icon.errors %}
+                <div class="absolute top-2 right-2 pointer-events-none">
+                  <i class="fa-solid fa-exclamation-circle text-red-500" aria-hidden="true"></i>
+                </div>
+                {% endif %}
+              </div>
+              {% if form.icon.errors %}
+              <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                {% for error in form.icon.errors %}
+                <div class="flex items-center mt-1">
+                  <i class="fa-solid fa-circle-exclamation text-xs mr-2" aria-hidden="true"></i>
+                  {{ error }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <i class="fa-solid fa-info-circle mr-1" aria-hidden="true"></i>
+                Ejemplo: bi bi-house, fa-solid fa-home
+              </div>
             </div>
 
-            <!-- Orden -->
-            <div class="{% if form.order.errors %}has-error{% endif %}">
+            <!-- Orden -->
+            <div class="field-container {% if form.order.errors %}has-error{% endif %}">
               <label for="{{ form.order.id_for_label }}" class="font-black uppercase text-sm md:text-base block mb-2
                      {% if form.order.errors %}text-red-600 dark:text-red-400{% else %}text-gray-600 dark:text-gray-300{% endif %}">
-                {{ form.order.label }}{% if form.order.field.required %}<span class="text-red-500">*</span>{% endif %}
+                {{ form.order.label }}{% if form.order.field.required %}<span class="text-red-500" aria-label="Campo requerido">*</span>{% endif %}
               </label>
-              {{ form.order }}
-              {% for error in form.order.errors %}
-              <div class="text-red-600 dark:text-red-400 text-sm mt-1">{{ error }}</div>
-              {% endfor %}
+              <div class="relative">
+                {{ form.order }}
+                {% if form.order.errors %}
+                <div class="absolute top-2 right-2 pointer-events-none">
+                  <i class="fa-solid fa-exclamation-circle text-red-500" aria-hidden="true"></i>
+                </div>
+                {% endif %}
+              </div>
+              {% if form.order.errors %}
+              <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                {% for error in form.order.errors %}
+                <div class="flex items-center mt-1">
+                  <i class="fa-solid fa-circle-exclamation text-xs mr-2" aria-hidden="true"></i>
+                  {{ error }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                <i class="fa-solid fa-info-circle mr-1" aria-hidden="true"></i>
+                Número que determina el orden de visualización
+              </div>
             </div>
 
           </div>
 
-          <!-- Botones -->
+          <!-- Botones -->
           <div class="flex flex-col md:flex-row justify-center items-center mt-12 space-y-3 md:space-y-0 md:space-x-8">
             <button type="submit"
-                    class="w-full md:w-auto bg-sky-600 hover:bg-sky-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-              <i class="fa-solid fa-save mr-2"></i>Guardar Menu
+                    class="w-full md:w-auto bg-sky-600 hover:bg-sky-700 text-gray-800 py-3 px-8 rounded-full shadow-lg transition-all duration-200 flex items-center justify-center transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
+              <i class="fa-solid fa-save mr-2" aria-hidden="true"></i>Guardar Menú
             </button>
             <a href="{% url 'security:menu_list' %}"
-               class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-gray-800 py-3 px-8 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-              <i class="fa-solid fa-xmark mr-2"></i>Cancelar
+               class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-gray-800 py-3 px-8 rounded-full shadow-lg transition-all duration-200 flex items-center justify-center transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+              <i class="fa-solid fa-xmark mr-2" aria-hidden="true"></i>Cancelar
             </a>
           </div>
 
@@ -103,25 +153,189 @@
   </div>
 </section>
 
-<!-- Estilos de error -->
+<!-- Toast para notificaciones -->
+<div id="toast" class="fixed top-4 right-4 z-50 hidden">
+  <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+    <i class="fa-solid fa-check-circle mr-2" aria-hidden="true"></i>
+    <span id="toast-message"></span>
+  </div>
+</div>
+
+<!-- Estilos mejorados -->
 <style>
 .field-container.has-error input,
-.field-container.has-error select { border-color:#ef4444!important; background:rgba(254,242,242,.5)!important; }
-@media (prefers-color-scheme:dark){
-  .field-container.has-error input,
-  .field-container.has-error select{ background:rgba(153,27,27,.2)!important; color:#fca5a5!important; }
+.field-container.has-error select,
+.field-container.has-error textarea {
+  border-color: #ef4444 !important;
+  background-color: rgba(254, 242, 242, 0.5) !important;
+  color: #991b1b !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
 }
-.field-container.has-error{ animation:shake .5s ease-in-out }
-@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-2px)}20%,40%,60%,80%{transform:translateX(2px)}}
+
+@media (prefers-color-scheme: dark) {
+  .field-container.has-error input,
+  .field-container.has-error select,
+  .field-container.has-error textarea {
+    background-color: rgba(153, 27, 27, 0.2) !important;
+    color: #fca5a5 !important;
+    border-color: #ef4444 !important;
+  }
+}
+
+.field-container.has-error {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* Transiciones suaves */
+input, select, textarea {
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Toast animation */
+.toast-enter {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: slideOutRight 0.3s ease-in;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
 </style>
 
 <script>
-// Vista previa icono
-document.addEventListener('DOMContentLoaded',()=>{
-  const iconInput=document.getElementById('{{ form.icon.id_for_label }}');
-  const iconPreview=document.getElementById('iconPreview');
-  const update=()=>{ const c=iconInput.value.trim(); iconPreview.className=c?`${c} text-3xl text-sky-600 dark:text-sky-400`:'bi bi-x-octagon text-3xl text-gray-400'; };
-  update(); ['input','change','keyup'].forEach(e=>iconInput.addEventListener(e,update));
+// Funciones utilitarias
+const showToast = (message, type = 'success') => {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toast-message');
+  const toastDiv = toast.querySelector('div');
+  
+  toastMessage.textContent = message;
+  
+  // Cambiar color según tipo
+  if (type === 'success') {
+    toastDiv.className = 'bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center';
+  } else if (type === 'error') {
+    toastDiv.className = 'bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center';
+  }
+  
+  toast.classList.remove('hidden');
+  toast.classList.add('toast-enter');
+  
+  setTimeout(() => {
+    toast.classList.add('toast-exit');
+    setTimeout(() => {
+      toast.classList.add('hidden');
+      toast.classList.remove('toast-enter', 'toast-exit');
+    }, 300);
+  }, 3000);
+};
+
+// Vista previa del ícono mejorada
+document.addEventListener('DOMContentLoaded', () => {
+  const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
+  const iconPreview = document.getElementById('iconPreview');
+  
+  const updatePreview = () => {
+    const iconClass = iconInput.value.trim();
+    const previewContainer = iconPreview.parentElement;
+    
+    if (iconClass) {
+      iconPreview.className = `${iconClass} text-3xl text-sky-600 dark:text-sky-400 transition-all duration-300`;
+      previewContainer.classList.add('ring-2', 'ring-sky-300', 'dark:ring-sky-600');
+      showToast('Vista previa del ícono actualizada', 'success');
+    } else {
+      iconPreview.className = 'bi bi-x-octagon text-3xl text-gray-400 transition-all duration-300';
+      previewContainer.classList.remove('ring-2', 'ring-sky-300', 'dark:ring-sky-600');
+    }
+  };
+  
+  // Inicializar vista previa
+  updatePreview();
+  
+  // Eventos para actualizar vista previa
+  ['input', 'change', 'keyup'].forEach(eventType => {
+    iconInput.addEventListener(eventType, updatePreview);
+  });
+  
+  // Validación en tiempo real
+  iconInput.addEventListener('blur', () => {
+    const value = iconInput.value.trim();
+    if (value && !value.includes(' ')) {
+      showToast('Recuerda incluir el prefijo de la librería (ej: bi bi-house)', 'error');
+    }
+  });
+});
+
+// Manejo mejorado del formulario
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('form');
+  const submitButton = form.querySelector('button[type="submit"]');
+  
+  form.addEventListener('submit', (e) => {
+    // Deshabilitar botón para evitar doble envío
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Guardando...';
+    
+    // Mostrar toast de procesamiento
+    showToast('Procesando formulario...', 'success');
+    
+    // Re-habilitar botón después de un tiempo (por si hay errores)
+    setTimeout(() => {
+      submitButton.disabled = false;
+      submitButton.innerHTML = '<i class="fa-solid fa-save mr-2"></i>Guardar Menú';
+    }, 5000);
+  });
+  
+  // Validación de campos en tiempo real
+  const inputs = form.querySelectorAll('input, select, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('blur', () => {
+      const fieldContainer = input.closest('.field-container');
+      if (input.value.trim() === '' && input.required) {
+        fieldContainer.classList.add('has-error');
+      } else {
+        fieldContainer.classList.remove('has-error');
+      }
+    });
+    
+    input.addEventListener('input', () => {
+      const fieldContainer = input.closest('.field-container');
+      if (input.value.trim() !== '') {
+        fieldContainer.classList.remove('has-error');
+      }
+    });
+  });
+});
+
+// Accesibilidad mejorada
+document.addEventListener('keydown', (e) => {
+  // Escape para cerrar toast
+  if (e.key === 'Escape') {
+    const toast = document.getElementById('toast');
+    if (!toast.classList.contains('hidden')) {
+      toast.classList.add('hidden');
+    }
+  }
 });
 </script>
 {% endblock %}

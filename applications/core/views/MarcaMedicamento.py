@@ -13,7 +13,7 @@ class MarcaMedicamentoCreateView(PermissionMixin,CreateViewMixin,CreateView):
     model = MarcaMedicamento
     form_class = MarcaMedicamentoForm
     template_name = 'core_l/MarcaMedicamento/MarcaMedicamentoCreate.html'
-    success_url = reverse_lazy('home')  # Ajusta según tu URL
+    success_url = reverse_lazy('core:medicamento_crear')  # Ajusta según tu URL
     
     def form_valid(self, form):
         messages.success(self.request, 'Marca de medicamento creada exitosamente.')

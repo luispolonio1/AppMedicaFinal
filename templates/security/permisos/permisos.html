@@ -1,26 +1,288 @@
 {% extends 'home.html' %}
+
 {% block title %}Permisos{% endblock %}
+
 {% block content %}
-<div class="grid md:grid-cols-3 gap-6 mt-6 px-4">
-    <a href="{% url 'security:group_module_permission_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
-        <h2 class="text-xl font-semibold text-indigo-600">Grupo-Módulo-Permiso</h2>
-        <p class="text-gray-500">Gestiona los permisos por grupo</p>
-    </a>
-    <a href="{% url 'security:module_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
-        <h2 class="text-xl font-semibold text-blue-600">Módulos</h2>
-        <p class="text-gray-500">Administra los módulos del sistema</p>
-    </a>
-    <a href="{% url 'security:menu_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
-        <h2 class="text-xl font-semibold text-purple-600">Menús</h2>
-        <p class="text-gray-500">Configura los menús</p>
-    </a>
-    <a href="{% url 'security:grupos_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
-        <h2 class="text-xl font-semibold text-green-600">Grupos</h2>
-        <p class="text-gray-500">Gestiona los grupos de usuarios</p>
-    </a>
-    <a href="{% url 'security:user_list' %}" class="rounded-xl bg-white p-6 shadow hover:shadow-lg transition">
-        <h2 class="text-xl font-semibold text-pink-600">Usuarios</h2>
-        <p class="text-gray-500">Administración de usuarios</p>
-    </a>
+<style>
+/* Estilos personalizados para la página de permisos */
+.permission-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.permission-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #d1d5db;
+}
+
+.permission-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.permission-card:hover::before {
+    opacity: 1;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.permission-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.stats-overview {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-overview::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    space-x: 2;
+    margin-bottom: 24px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.breadcrumb svg {
+    width: 16px;
+    height: 16px;
+    margin: 0 8px;
+}
+
+@media (max-width: 768px) {
+    .quick-actions {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .permission-card {
+        padding: 16px;
+    }
+}
+</style>
+
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2m-6 4h4"></path>
+            </svg>
+            <span>Administración</span>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+            <span class="text-gray-900 font-medium">Gestión de Permisos</span>
+        </div>
+        
+        <!-- Header Principal -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200">
+            <div class="stats-overview">
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-white/20 rounded-full p-3">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-white">Sistema de Permisos</h1>
+                            <p class="text-white/90 text-lg">Administra la seguridad y accesos del sistema</p>
+                        </div>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">5</div>
+                            <div class="text-white/80 text-sm">Módulos</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">24</div>
+                            <div class="text-white/80 text-sm">Permisos</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white">8</div>
+                            <div class="text-white/80 text-sm">Grupos</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Acciones Rápidas -->
+        <div class="quick-actions">
+            <!-- Grupo-Módulo-Permiso -->
+            <a href="{% url 'security:group_module_permission_list' %}" 
+               class="permission-card rounded-xl p-6 shadow-lg text-decoration-none block"
+               style="--card-color: #6366f1; --card-color-light: #818cf8;">
+                <div class="card-icon" style="background-color: rgba(99, 102, 241, 0.1);">
+                    <svg class="w-6 h-6" style="color: #6366f1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Grupo-Módulo-Permiso</h2>
+                <p class="text-gray-600 mb-4">Gestiona los permisos específicos por grupo de usuarios</p>
+                <div class="flex items-center text-sm text-indigo-600 font-medium">
+                    <span>Administrar permisos</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+            
+            <!-- Módulos -->
+            <a href="{% url 'security:module_list' %}" 
+               class="permission-card rounded-xl p-6 shadow-lg text-decoration-none block"
+               style="--card-color: #3b82f6; --card-color-light: #60a5fa;">
+                <div class="card-icon" style="background-color: rgba(59, 130, 246, 0.1);">
+                    <svg class="w-6 h-6" style="color: #3b82f6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Módulos del Sistema</h2>
+                <p class="text-gray-600 mb-4">Administra y configura los módulos funcionales</p>
+                <div class="flex items-center text-sm text-blue-600 font-medium">
+                    <span>Gestionar módulos</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+            
+            <!-- Menús -->
+            <a href="{% url 'security:menu_list' %}" 
+               class="permission-card rounded-xl p-6 shadow-lg text-decoration-none block"
+               style="--card-color: #8b5cf6; --card-color-light: #a78bfa;">
+                <div class="card-icon" style="background-color: rgba(139, 92, 246, 0.1);">
+                    <svg class="w-6 h-6" style="color: #8b5cf6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Menús de Navegación</h2>
+                <p class="text-gray-600 mb-4">Configura la estructura de menús del sistema</p>
+                <div class="flex items-center text-sm text-purple-600 font-medium">
+                    <span>Configurar menús</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+            
+            <!-- Grupos -->
+            <a href="{% url 'security:grupos_list' %}" 
+               class="permission-card rounded-xl p-6 shadow-lg text-decoration-none block"
+               style="--card-color: #10b981; --card-color-light: #34d399;">
+                <div class="card-icon" style="background-color: rgba(16, 185, 129, 0.1);">
+                    <svg class="w-6 h-6" style="color: #10b981;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Grupos de Usuarios</h2>
+                <p class="text-gray-600 mb-4">Gestiona los grupos y roles de usuario</p>
+                <div class="flex items-center text-sm text-green-600 font-medium">
+                    <span>Administrar grupos</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+            
+            <!-- Usuarios -->
+            <a href="{% url 'security:user_list' %}" 
+               class="permission-card rounded-xl p-6 shadow-lg text-decoration-none block"
+               style="--card-color: #ec4899; --card-color-light: #f472b6;">
+                <div class="card-icon" style="background-color: rgba(236, 72, 153, 0.1);">
+                    <svg class="w-6 h-6" style="color: #ec4899;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Usuarios del Sistema</h2>
+                <p class="text-gray-600 mb-4">Administración completa de usuarios registrados</p>
+                <div class="flex items-center text-sm text-pink-600 font-medium">
+                    <span>Gestionar usuarios</span>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+            </a>
+        </div>
+        
+        <!-- Información adicional -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mt-8 border border-gray-200">
+            <div class="flex items-start space-x-3">
+                <div class="bg-blue-100 rounded-full p-2">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Información Importante</h3>
+                    <p class="text-gray-600 mb-2">
+                        El sistema de permisos permite un control granular sobre las funcionalidades del sistema. 
+                        Asegúrate de configurar correctamente los permisos para mantener la seguridad.
+                    </p>
+                    <ul class="text-sm text-gray-500 space-y-1">
+                        <li>• Los permisos se asignan por grupo para facilitar la administración</li>
+                        <li>• Cada módulo puede tener múltiples permisos específicos</li>
+                        <li>• Los usuarios heredan los permisos de sus grupos asignados</li>
+                        <li>• Los cambios en permisos se aplican inmediatamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+                <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-4">
+            <a href="{% url 'home' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-gray-800 bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Volver al Inicio
+            </a>
+        </div>
+    </div>
 </div>
 {% endblock %}

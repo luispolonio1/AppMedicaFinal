@@ -19,6 +19,23 @@
     border-color: #c4c7ca;
 }
 
+    <!-- Paginación -->
+    {% include 'fragments/pagination.html' with page_obj=page_obj %}
+
+    <!-- Botones de acción -->
+    <div class="flex flex-col md:flex-row justify-center p-4 space-y-2 md:space-y-0 md:space-x-2">
+      {% if permissions.add_atencion %}
+      <a href="{% url 'doctor:cita_create' %}" class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-plus mr-2"></i> Nueva Cita
+      </a>
+      {% endif %}
+      <a href="{% url 'doctor:cita_list' %}" class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-users mr-2"></i> Ver Pacientes
+      </a>
+      <a href="{% url 'home' %}" class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-house"></i>
+      </a>
+    </div>
 .status-badge {
     display: inline-flex;
     align-items: center;

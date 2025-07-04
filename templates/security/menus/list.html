@@ -5,139 +5,373 @@
 {% block content %}
 {% include 'fragments/messages.html' %}
 
+<style>
+/* Estilos personalizados para menús */
+.menu-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+}
+
+.menu-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #cbd5e1;
+}
+
+.dark .menu-card {
+    background-color: #0b1121;
+    border-color: #1e293b;
+}
+
+.dark .menu-card:hover {
+    background-color: #121c33;
+    border-color: #334155;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    transition: all 0.2s ease;
+    border-color: #0ea5e9;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    border-color: #0284c7;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+}
+
+.btn-edit {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: #0284c7;
+}
+
+.btn-edit:hover {
+    background-color: rgba(14, 165, 233, 0.2);
+}
+
+.btn-delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+.order-badge {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: #4b5563;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.dark .order-badge {
+    background-color: rgba(107, 114, 128, 0.2);
+    color: #9ca3af;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.dark .empty-state {
+    background-color: #0b1121;
+    border-color: #1e293b;
+}
+
+@media (max-width: 768px) {
+    .menu-card {
+        margin-bottom: 1rem;
+    }
+    
+    .hidden-mobile {
+        display: none;
+    }
+}
+</style>
+
 <section class="mt-4 bg-white dark:bg-principal">
   <div class="container mx-auto px-4">
 
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
-      {{ title1 }}
-    </h1>
-
-    <!-- Buscador -->
-    <div class="mt-6 flex justify-center">
-      <form method="get" class="relative w-full max-w-lg">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
-        <input
-          type="text"
-          name="q"
-          id="table-search"
-          placeholder="Búsqueda sin límites"
-          value="{{ request.GET.q }}"
-          class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
-                 focus:outline-none focus:ring-2 focus:ring-sky-500
-                 bg-white text-gray-800 dark:bg-principal dark:text-gray-200"
-        >
-      </form>
+    <!-- Header -->
+    <div class="bg-white dark:bg-principal rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200 dark:border-secundario">
+      <div class="bg-blue-500 px-8 py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="bg-white/20 rounded-full p-3">
+              <i class="fa-solid fa-bars text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-2xl text-white font-black">{{ title1 }}</h1>
+              <p class="text-white text-sm">Gestión de menús del sistema</p>
+            </div>
+          </div>
+          <!-- Botón Nuevo Menú -->
+          {% if permissions.add_menu %}
+          <a href="{% url 'security:menu_create' %}" class="inline-flex items-center px-4 py-2 bg-white text-gray-400 font-semibold rounded-lg shadow hover:bg-sky-50 transition-colors">
+            <i class="fa-solid fa-plus mr-2"></i>
+            Nuevo Menú
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      
+      <!-- Estadísticas -->
+      <div class="p-6 text-blue-800 border-t border-gray-200 dark:border-secundario">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-[#121c33] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+            <div class="flex items-center">
+              <div class="bg-sky-100 dark:bg-sky-900 rounded-full p-2 mr-3">
+                <i class="fa-solid fa-bars text-sky-800 dark:text-sky-200"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Menús</p>
+                <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ menus|length }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-[#121c33] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+            <div class="flex items-center">
+              <div class="bg-green-100 dark:bg-green-900 rounded-full p-2 mr-3">
+                <i class="fa-solid fa-check text-green-600 dark:text-green-200"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Activos</p>
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ menus|length }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-[#121c33] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+            <div class="flex items-center">
+              <div class="bg-indigo-100 dark:bg-indigo-900 rounded-full p-2 mr-3">
+                <i class="fa-solid fa-sort-numeric-up text-indigo-600 dark:text-indigo-200"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Ordenados</p>
+                <p class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{{ menus|length }}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-[#121c33] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+            <div class="flex items-center">
+              <div class="bg-sky-100 dark:bg-sky-900 rounded-full p-2 mr-3">
+                <i class="fa-solid fa-file-lines text-sky-800 dark:text-sky-200"></i>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Página</p>
+                <p class="text-2xl font-bold text-sky-800 dark:text-sky-400">{{ page_obj.number|default:1 }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Tabla -->
-    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
-      <table class="w-full text-center text-sm md:text-base">
-        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
-          <tr>
-            <th class="py-3 px-4">ID</th>
-            <th class="py-3 px-4">Icono</th>
-            <th class="py-3 px-4">Nombre</th>
-            <th class="py-3 px-4">Orden</th>
-            <th class="py-3 px-4">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in menus %}
-          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario
-                     hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300
-                     text-gray-600 dark:text-gray-400">
-            <td class="py-4 px-4">{{ item.id }}</td>
-            <td class="py-4 px-4"><i class="{{ item.icon }} text-2xl text-sky-600 dark:text-sky-400"></i></td>
-            <td class="py-4 px-4 font-semibold">{{ item.name }}</td>
-            <td class="py-4 px-4">
-              <span class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full text-xs">{{ item.order }}</span>
-            </td>
-            <td class="py-4 px-4">
-              {% if permissions.change_menu %}
-              <a href="{% url 'security:menu_update' item.id %}"
-                 class="text-sky-500 hover:text-sky-700 mx-1 transition-colors duration-200">
-                <i class="fa-solid fa-edit text-lg"></i>
-              </a>
-              {% endif %}
-              {% if permissions.delete_menu %}
-              <a href="#"
-                 class="text-red-600 hover:text-red-800 mx-1 transition-colors duration-200"
-                 onclick="openDeleteModal('{{ item.id }}', '{{ item.name }}')">
-                <i class="fa-solid fa-trash text-lg"></i>
-              </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Buscador -->
+    <div class="bg-white dark:bg-principal rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-secundario">
+      <div class="search-container max-w-lg mx-auto">
+        <form method="get" class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="fa-solid fa-magnifying-glass text-sky-500"></i>
+          </div>
+          <input
+            type="text"
+            name="q"
+            id="table-search"
+            placeholder="Búsqueda sin límites"
+            value="{{ request.GET.q }}"
+            class="search-input block w-full pl-10 pr-3 py-2 border border-sky-300 rounded-lg leading-5 bg-white dark:bg-principal placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 text-gray-800 dark:text-gray-200"
+          >
+        </form>
+      </div>
     </div>
 
-    <!-- Paginación -->
-    <div class="flex justify-center mt-6">
-      <nav aria-label="Page navigation">
-        <ul class="inline-flex -space-x-px">
+    <!-- Lista de menús -->
+    <div class="space-y-4">
+      {% if menus %}
+        {% for item in menus %}
+        <div class="menu-card rounded-xl shadow-lg overflow-hidden border">
+          <div class="p-6">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <!-- Icono del menú -->
+                <div class="flex-shrink-0">
+                  <div class="h-16 w-16 rounded-full bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center">
+                    <i class="{{ item.icon }} text-gray-800 text-2xl"></i>
+                  </div>
+                </div>
+                
+                <!-- Información del menú -->
+                <div class="flex-1">
+                  <div class="flex items-center space-x-2 mb-2">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      {{ item.name }}
+                    </h3>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">#{{ item.id }}</span>
+                  </div>
+                  
+                  <div class="flex items-center space-x-2">
+                    <span class="order-badge">
+                      <i class="fa-solid fa-sort-numeric-up mr-1"></i>
+                      Orden: {{ item.order }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Acciones -->
+              <div class="flex items-center space-x-2">
+                {% if permissions.change_menu %}
+                <a href="{% url 'security:menu_update' item.id %}" class="action-btn btn-edit" title="Editar menú">
+                  <i class="fa-solid fa-edit"></i>
+                </a>
+                {% endif %}
+                
+                {% if permissions.delete_menu %}
+                <button class="action-btn btn-delete" 
+                        title="Eliminar menú"
+                        onclick="openDeleteModal('{{ item.id }}', '{{ item.name }}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <!-- Estado vacío -->
+        <div class="empty-state">
+          <div class="text-center py-12">
+            <i class="fa-solid fa-bars text-gray-400 dark:text-gray-600 text-6xl mb-4"></i>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay menús registrados</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza creando tu primer menú del sistema.</p>
+            {% if permissions.add_menu %}
+            <div class="mt-6">
+              <a href="{% url 'security:menu_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Crear Menú
+              </a>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="bg-white dark:bg-principal rounded-xl shadow-lg px-4 py-3 mt-8 border border-gray-200 dark:border-secundario">
+      <div class="flex items-center justify-between">
+        <div class="flex-1 flex justify-between sm:hidden">
           {% if page_obj.has_previous %}
-          <li>
-            <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg
-                      hover:bg-sky-50 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#0b1121] border border-gray-300 dark:border-secundario rounded-md hover:bg-gray-50 dark:hover:bg-[#121c33]">
               Anterior
             </a>
-          </li>
           {% endif %}
-
-          {% for num in page_obj.paginator.page_range %}
-          <li>
-            <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight
-                      {% if num == page_obj.number %}
-                        text-sky-700 bg-sky-100 border border-gray-300
-                        dark:bg-secundario dark:border-principal dark:text-sky-300
-                      {% else %}
-                        text-gray-500 bg-white border border-gray-300 hover:bg-sky-50 hover:text-gray-700
-                        dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white
-                      {% endif %}">
-              {{ num }}
-            </a>
-          </li>
-          {% endfor %}
-
+          
           {% if page_obj.has_next %}
-          <li>
-            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-               class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg
-                      hover:bg-sky-50 hover:text-gray-700 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white">
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#0b1121] border border-gray-300 dark:border-secundario rounded-md hover:bg-gray-50 dark:hover:bg-[#121c33]">
               Siguiente
             </a>
-          </li>
           {% endif %}
-        </ul>
-      </nav>
+        </div>
+        
+        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              Mostrando
+              <span class="font-medium">{{ page_obj.start_index }}</span>
+              a
+              <span class="font-medium">{{ page_obj.end_index }}</span>
+              de
+              <span class="font-medium">{{ page_obj.paginator.count }}</span>
+              resultados
+            </p>
+          </div>
+          
+          <div>
+            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+              {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-secundario bg-white dark:bg-[#0b1121] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                  <span class="sr-only">Primera página</span>
+                  <i class="fa-solid fa-angles-left"></i>
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-secundario bg-white dark:bg-[#0b1121] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                  <span class="sr-only">Anterior</span>
+                  <i class="fa-solid fa-chevron-left"></i>
+                </a>
+              {% endif %}
+              
+              {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                  <span class="relative inline-flex items-center px-4 py-2 border border-sky-500 bg-sky-50 dark:bg-secundario text-sm font-medium text-sky-600 dark:text-sky-300">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                  <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-secundario bg-white dark:bg-[#0b1121] text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-[#121c33]">{{ num }}</a>
+                {% endif %}
+              {% endfor %}
+              
+              {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-2 py-2 border border-gray-300 dark:border-secundario bg-white dark:bg-[#0b1121] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                  <span class="sr-only">Siguiente</span>
+                  <i class="fa-solid fa-chevron-right"></i>
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-secundario bg-white dark:bg-[#0b1121] text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-[#121c33]">
+                  <span class="sr-only">Última página</span>
+                  <i class="fa-solid fa-angles-right"></i>
+                </a>
+              {% endif %}
+            </nav>
+          </div>
+        </div>
+      </div>
     </div>
+    {% endif %}
 
-    <!-- Botones -->
+    <!-- Botones de navegación -->
     <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
       <a href="{% url 'security:permission_dashboard' %}"
-          class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-          <i class="fa-solid fa-backward-step"></i> atras
+         class="inline-flex items-center justify-center px-4 py-2 bg-sky-600 hover:bg-sky-700 text-gray-800 font-semibold rounded-lg shadow transition-colors">
+        <i class="fa-solid fa-backward-step mr-2"></i>
+        Atrás
       </a>
-      {% if permissions.add_menu %}
-      <a href="{% url 'security:menu_create' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nuevo Menu
-      </a>
-      {% endif %}
-
+      
       <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-         <i class="fa-solid fa-house"></i> Inicio
-  </div>
+         class="inline-flex items-center justify-center px-4 py-2 bg-sky-600 hover:bg-sky-700 text-gray-800 font-semibold rounded-lg shadow transition-colors">
+        <i class="fa-solid fa-house mr-2"></i>
+        Inicio
+      </a>
+    </div>
   </div>
 </section>
 
 {% include 'fragments/delete.html' %}
+
 <script>
 function openDeleteModal(id, name) {
   const deleteForm = document.getElementById('deleteForm');
@@ -145,9 +379,11 @@ function openDeleteModal(id, name) {
   document.getElementById('Description').textContent = `ID: ${id} - ${name}`;
   document.getElementById('deleteModal').classList.remove('hidden');
 }
+
 function closeModal() {
   document.getElementById('deleteModal').classList.add('hidden');
 }
+
 document.addEventListener('DOMContentLoaded', () => {
   const deleteForm = document.getElementById('deleteForm');
   if (deleteForm) {
@@ -157,6 +393,26 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Eliminando…';
         btn.disabled = true;
       }
+    });
+  }
+
+  // Funcionalidad de búsqueda en tiempo real
+  const searchInput = document.getElementById('table-search');
+  const menuCards = document.querySelectorAll('.menu-card');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      menuCards.forEach(card => {
+        const cardText = card.textContent.toLowerCase();
+        
+        if (cardText.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
     });
   }
 });

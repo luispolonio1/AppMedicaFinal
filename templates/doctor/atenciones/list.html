@@ -5,142 +5,475 @@
 {% block content %}
 {% include 'fragments/messages.html' %}
 
-<section class="mt-4 bg-white dark:bg-principal">
-  <div class="container mx-auto px-4">
+<style>
+/* Estilos personalizados para la lista de atenciones */
+.attention-card {
+    transition: all 0.3s ease;
+    border: 1px solid #e2e8f0;
+    background-color: white;
+}
 
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
-      {{ title1 }}
-    </h1>
+.attention-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #cbd5e1;
+}
 
-    <!-- Buscador -->
-    <div class="mt-6 flex justify-center">
-      <form method="get" class="relative w-full max-w-lg">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
-        <input
-          type="text"
-          name="q"
-          id="table-search"
-          value="{{ request.GET.q }}"
-          placeholder="Buscar por paciente, diagnóstico o motivo..."
-          class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
-                 focus:outline-none focus:ring-2 focus:ring-sky-500
-                 bg-white text-gray-800 dark:bg-principal dark:text-gray-200"
-        >
-      </form>
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.diagnosis-badge {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+}
+
+.symptom-badge {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.treatment-badge {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #b45309;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 40px;
+    transition: all 0.2s ease;
+    border-color: #0ea5e9;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    border-color: #0ea5e9;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    height: 40px;
+}
+
+.btn-view {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+}
+
+.btn-view:hover {
+    background-color: rgba(14, 165, 233, 0.2);
+}
+
+.btn-edit {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.btn-edit:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+}
+
+.btn-delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+}
+
+.table-modern {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table-modern th,
+.table-modern td {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 16px;
+}
+
+.table-modern th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+}
+
+.table-modern tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.dark .attention-card {
+    background-color: #0b1121;
+    border-color: #1e293b;
+}
+
+.dark .attention-card:hover {
+    background-color: #121c33;
+    border-color: #334155;
+}
+
+.dark .table-modern th {
+    background-color: #1e293b;
+    color: #e2e8f0;
+}
+
+.dark .table-modern tbody tr:hover {
+    background-color: #1e293b;
+}
+
+@media (max-width: 768px) {
+    .hidden-mobile {
+        display: none;
+    }
+    
+    .table-mobile {
+        display: block;
+    }
+    
+    .table-mobile .attention-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<div class="min-h-screen bg-gray-50 dark:bg-principal py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="bg-white dark:bg-[#0b1121] rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200 dark:border-secundario">
+            <div class="bg-blue-500 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white/20 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl text-white font-black">{{ title1 }}</h1>
+                            <p class="text-white text-sm">Gestión de atenciones médicas</p>
+                        </div>
+                    </div>
+                    <!-- Botón Nueva Atención -->
+                    {% if permissions.add_atencion %}
+                    <a href="{% url 'doctor:atencion_create' %}" class="inline-flex items-center px-4 py-2 bg-white text-gray-400 font-semibold rounded-lg shadow hover:bg-sky-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nueva Atención
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="p-6 bg-gray-50 dark:bg-[#121c33] border-t border-gray-200 dark:border-secundario">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white dark:bg-[#0b1121] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+                        <div class="flex items-center">
+                            <div class="bg-sky-100 dark:bg-sky-900 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-sky-800 dark:text-sky-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Atenciones</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ paginator.count|default:atenciones|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-[#0b1121] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 dark:bg-green-900 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-green-600 dark:text-green-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Pacientes Atendidos</p>
+                                <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ atenciones|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-[#0b1121] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 dark:bg-blue-900 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-blue-800 dark:text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Hoy</p>
+                                <p class="text-2xl font-bold text-blue-800 dark:text-blue-200">{{ today_count|default:0 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white dark:bg-[#0b1121] rounded-lg p-4 border border-gray-200 dark:border-secundario">
+                        <div class="flex items-center">
+                            <div class="bg-sky-100 dark:bg-sky-900 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-sky-800 dark:text-sky-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Página</p>
+                                <p class="text-2xl font-bold text-sky-800 dark:text-sky-200">{{ page_obj.number|default:1 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white dark:bg-[#0b1121] rounded-xl shadow-lg p-6 mb-6 border border-gray-200 dark:border-secundario">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="search-container flex-1 max-w-md">
+                    <form method="get" class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               name="q"
+                               value="{{ request.GET.q }}"
+                               class="search-input block w-full pl-10 pr-3 py-2 border border-sky-300 rounded-lg leading-5 bg-white dark:bg-[#0b1121] placeholder-gray-500 dark:placeholder-gray-400 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500" 
+                               placeholder="Buscar por paciente, diagnóstico o motivo...">
+                    </form>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <select class="block w-full px-3 py-2 border border-gray-300 dark:border-secundario rounded-lg bg-white dark:bg-[#0b1121] text-sm focus:ring-sky-500 focus:border-sky-500 text-gray-800 dark:text-gray-200">
+                        <option value="">Todos los diagnósticos</option>
+                    </select>
+                    
+                    <select class="block w-full px-3 py-2 border border-gray-300 dark:border-secundario rounded-lg bg-white dark:bg-[#0b1121] text-sm focus:ring-sky-500 focus:border-sky-500 text-gray-800 dark:text-gray-200">
+                        <option value="">Filtrar por fecha</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de atenciones -->
+        <div class="bg-white dark:bg-[#0b1121] rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-secundario">
+            <div class="overflow-x-auto">
+                <table class="table-modern w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-left">ID</th>
+                            <th class="text-left">Paciente</th>
+                            <th class="text-left">Fecha</th>
+                            <th class="text-left">Motivo</th>
+                            <th class="text-left hidden-mobile">Síntomas</th>
+                            <th class="text-left">Diagnóstico</th>
+                            <th class="text-left hidden-mobile">Tratamiento</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for atencion in atenciones %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-[#121c33] transition-colors duration-200">
+                            <td class="font-semibold text-gray-900 dark:text-gray-100">#{{ atencion.id }}</td>
+                            <td>
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center">
+                                            <span class="text-white font-bold text-sm">
+                                                {{ atencion.paciente.nombres.0 }}{{ atencion.paciente.apellidos.0 }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900 dark:text-gray-100">
+                                            {{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}
+                                        </div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            {{ atencion.paciente.numero_identificacion }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-sm">
+                                    <div class="font-medium text-gray-900 dark:text-gray-100">{{ atencion.fecha_atencion|date:"d/m/Y" }}</div>
+                                    <div class="text-gray-500 dark:text-gray-400">{{ atencion.fecha_atencion|time:"H:i" }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="max-w-xs">
+                                    <p class="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                        {{ atencion.motivo_consulta|default:"Sin especificar" }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="hidden-mobile">
+                                <div class="max-w-xs">
+                                    <p class="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                        {{ atencion.sintomas|default:"Sin registrar" }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td>
+                                {% for diag in atencion.diagnostico.all %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium diagnosis-badge mb-1">
+                                    {{ diag.codigo }}
+                                </span>
+                                {% empty %}
+                                <span class="text-gray-400 dark:text-gray-500 italic text-xs">Sin diagnóstico</span>
+                                {% endfor %}
+                            </td>
+                            <td class="hidden-mobile">
+                                <div class="max-w-xs">
+                                    <p class="text-sm text-gray-900 dark:text-gray-100 truncate">
+                                        {{ atencion.tratamiento|default:"Sin tratamiento" }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="flex justify-center space-x-2">
+                                    {% if permissions.view_atencion %}
+                                    <button class="action-btn btn-view" title="Ver detalles">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                    </button>
+                                    {% endif %}
+                                    {% if permissions.change_atencion %}
+                                    <a href="{% url 'doctor:atencion_update' atencion.id %}" class="action-btn btn-edit" title="Editar">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </a>
+                                    {% endif %}
+                                    {% if permissions.delete_atencion %}
+                                    <button class="action-btn btn-delete" 
+                                            title="Eliminar"
+                                            onclick="openDeleteModal('{{ atencion.id }}', '{{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}')">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-12">
+                                <div class="empty-state">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No hay atenciones registradas</h3>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza creando tu primera atención médica.</p>
+                                    {% if permissions.add_atencion %}
+                                    <div class="mt-6">
+                                        <a href="{% url 'doctor:atencion_create' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-gray-800 bg-sky-600 hover:bg-sky-700">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                            Nueva Atención
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Paginación -->
+        {% include 'fragments/pagination.html' with page_obj=page_obj %}
+        
+        <!-- Botones de acción -->
+        <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-4">
+            <a href="{% url 'home' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-gray-800 bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                </svg>
+                Volver al Inicio
+            </a>
+        </div>
     </div>
-
-    <!-- Tabla -->
-    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
-      <table class="w-full text-center text-sm md:text-base">
-        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
-          <tr>
-            <th class="px-4 py-3">ID</th>
-            <th class="px-4 py-3">Paciente</th>
-            <th class="px-4 py-3">Fecha</th>
-            <th class="px-4 py-3">Motivo</th>
-            <th class="px-4 py-3">Síntomas</th>
-            <th class="px-4 py-3">Diagnóstico</th>
-            <th class="px-4 py-3">Tratamiento</th>
-            <th class="px-4 py-3">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for atencion in atenciones %}
-          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300 text-gray-600 dark:text-gray-400">
-            <td class="px-4 py-4 font-semibold">#{{ atencion.id }}</td>
-            <td class="px-4 py-4">
-              <span class="block font-medium text-gray-900 dark:text-gray-100">
-                {{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}
-              </span>
-              <span class="text-xs text-gray-500 dark:text-gray-400">
-                {{ atencion.paciente.numero_identificacion }}
-              </span>
-            </td>
-            <td class="px-4 py-4">
-              <span class="block">{{ atencion.fecha_atencion|date:"d/m/Y" }}</span>
-              <span class="text-xs text-gray-500">{{ atencion.fecha_atencion|time:"H:i" }}</span>
-            </td>
-            <td class="px-4 py-4 text-left">
-              {{ atencion.motivo_consulta|default:"Sin especificar"|truncatechars:60 }}
-            </td>
-            <td class="px-4 py-4 text-left">
-              {{ atencion.sintomas|default:"Sin registrar"|truncatechars:60 }}
-            </td>
-            <td class="px-4 py-4">
-              {% for diag in atencion.diagnostico.all %}
-              <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full text-xs">
-                {{ diag.codigo }}
-              </span>
-              {% empty %}
-              <span class="text-gray-400 italic text-xs">Sin diagnóstico</span>
-              {% endfor %}
-            </td>
-            <td class="px-4 py-4 text-left">
-              {{ atencion.tratamiento|default:"Sin tratamiento"|truncatechars:60 }}
-            </td>
-            <td class="px-4 py-4">
-              <div class="flex justify-center space-x-2">
-                {% if permissions.view_atencion %}
-                <a href="#" class="text-sky-500 hover:text-sky-700 transition" title="Ver">
-                  <i class="fa-solid fa-eye text-lg"></i>
-                </a>
-                {% endif %}
-                {% if permissions.change_atencion %}
-                <a href="{% url 'doctor:atencion_update' atencion.id %}" class="text-sky-500 hover:text-sky-700 transition" title="Editar">
-                  <i class="fa-solid fa-edit text-lg"></i>
-                </a>
-                {% endif %}
-                {% if permissions.delete_atencion %}
-                <a href="#" class="text-red-600 hover:text-red-800 transition" title="Eliminar"
-                   onclick="openDeleteModal('{{ atencion.id }}', '{{ atencion.paciente.nombres }} {{ atencion.paciente.apellidos }}')">
-                  <i class="fa-solid fa-trash text-lg"></i>
-                </a>
-                {% endif %}
-              </div>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="8" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-              <i class="fa-solid fa-stethoscope text-4xl mb-2 text-gray-300"></i>
-              <p class="text-lg">No se encontraron atenciones médicas</p>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Paginación -->
-    {% include 'fragments/pagination.html' with page_obj=page_obj %}
-
-    <!-- Botones -->
-    <div class="flex flex-col md:flex-row justify-center p-6 space-y-2 md:space-y-0 md:space-x-2">
-      {% if permissions.add_atencion %}
-      <a href="{% url 'doctor:atencion_create' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nueva Atención Médica
-      </a>
-      {% endif %}
-      <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-house mr-2"></i> Inicio
-      </a>
-    </div>
-  </div>
-</section>
+</div>
 
 {% include 'fragments/delete.html' %}
+
 <script>
 function openDeleteModal(id, texto) {
-  const deleteForm = document.getElementById('deleteForm');
-  deleteForm.action = "{% url 'doctor:atencion_delete' 0 %}".replace('0', id);
-  document.getElementById('Description').textContent = texto;
-  document.getElementById('deleteModal').classList.remove('hidden');
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = "{% url 'doctor:atencion_delete' 0 %}".replace('0', id);
+    document.getElementById('Description').textContent = texto;
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
+
 function closeModal() {
-  document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
 }
+
+// Funcionalidad de búsqueda en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="q"]');
+    const tableRows = document.querySelectorAll('tbody tr');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                if (row.cells.length > 1) { // No aplicar a la fila de "sin resultados"
+                    const patientName = row.cells[1].textContent.toLowerCase();
+                    const reason = row.cells[3].textContent.toLowerCase();
+                    const diagnosis = row.cells[5].textContent.toLowerCase();
+                    
+                    if (patientName.includes(searchTerm) || 
+                        reason.includes(searchTerm) || 
+                        diagnosis.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                }
+            });
+        });
+    }
+});
 </script>
 {% endblock %}
