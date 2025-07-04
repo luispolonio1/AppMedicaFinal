@@ -9,4 +9,4 @@ class TipoMedicamentoCreateView(PermissionMixin,CreateViewMixin,CreateView):
     model = TipoMedicamento
     form_class = TipoMedicamentoForm
     template_name = 'core_l/TipoMedicamento/TipoMedicamento.html'  # Ajusta la ruta según tu estructura
-    success_url = reverse_lazy('home')  # Cambia por tu URL de listado
+    success_url = reverse_lazy('core:medicamento_crear')  # Cambia por tu URL de listado

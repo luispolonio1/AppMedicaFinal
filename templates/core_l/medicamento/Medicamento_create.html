@@ -7,224 +7,317 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <!-- Header con gradiente -->
-                <div class="text-center mb-4">
-                    <div class="d-inline-block p-3 rounded-circle bg-gradient-primary text-white mb-3" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
-                        <i class="fas fa-capsules fa-2x"></i>
+                <!-- Header con animación -->
+                <div class="text-center mb-5 header-animation">
+                    <div class="icon-wrapper mb-4">
+                        <div class="floating-icon">
+                            <i class="fas fa-capsules fa-3x"></i>
+                        </div>
+                        <div class="icon-bg"></div>
                     </div>
-                    <h2 class="fw-bold text-dark mb-1">Nuevo Medicamento</h2>
-                    <p class="text-muted">Registra un nuevo medicamento en el sistema</p>
+                    <h1 class="display-5 fw-bold text-dark mb-2 title-gradient">Nuevo Medicamento</h1>
+                    <p class="lead text-muted mb-0">Registra un nuevo medicamento en el sistema</p>
+                    <div class="divider-line"></div>
                 </div>
 
-                <!-- Card principal -->
-                <div class="card border-0 shadow-lg" style="border-radius: 20px;">
-                    <div class="card-header text-white" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border-radius: 20px 20px 0 0;">
-                        <h4 class="mb-0 fw-bold">
-                            <i class="fas fa-plus-circle me-2"></i>
-                            Información del Medicamento
-                        </h4>
+                <!-- Card principal con glassmorphism -->
+                <div class="main-card">
+                    <div class="card-header-custom">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div>
+                                <h3 class="mb-0 fw-bold">Información del Medicamento</h3>
+                                <small class="opacity-75">Complete todos los campos requeridos</small>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="card-body p-4">
+                    <div class="card-body-custom">
                         <!-- Mostrar mensajes -->
                         {% if messages %}
                             {% for message in messages %}
-                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 rounded-3 mb-4" role="alert">
-                                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} me-2"></i>
-                                    {{ message }}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                <div class="alert-custom alert-{{ message.tags }} mb-4" role="alert">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %}"></i>
+                                    </div>
+                                    <div class="alert-content">
+                                        <span>{{ message }}</span>
+                                        <button type="button" class="alert-close" data-bs-dismiss="alert">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             {% endfor %}
                         {% endif %}
 
                         <!-- Formulario -->
-                        <form method="post" enctype="multipart/form-data" novalidate>
+                        <form method="post" enctype="multipart/form-data" novalidate class="form-modern">
                             {% csrf_token %}
                             
-                            <!-- Fila 1: Información Básica -->
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <label for="{{ form.tipo.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-layer-group text-success me-1"></i>
-                                        {{ form.tipo.label }}
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.tipo }}
-                                    {% if form.tipo.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.tipo.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
+                            <!-- Sección 1: Información Básica -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-info-circle"></i>
+                                        Información Básica
+                                    </h5>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.marca_medicamento.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-trademark text-success me-1"></i>
-                                        {{ form.marca_medicamento.label }}
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.marca_medicamento }}
-                                    {% if form.marca_medicamento.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.marca_medicamento.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.nombre.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-pills text-success me-1"></i>
-                                        {{ form.nombre.label }}
-                                        <span class="text-danger">*</span>
-                                    </label>
-                                    {{ form.nombre }}
-                                    {% if form.nombre.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.nombre.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Fila 2: Descripción -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <label for="{{ form.descripcion.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-align-left text-success me-1"></i>
-                                        {{ form.descripcion.label }}
-                                    </label>
-                                    {{ form.descripcion }}
-                                    {% if form.descripcion.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.descripcion.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Fila 3: Especificaciones Técnicas -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="{{ form.concentracion.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-vial text-success me-1"></i>
-                                        {{ form.concentracion.label }}
-                                    </label>
-                                    {{ form.concentracion }}
-                                    {% if form.concentracion.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.concentracion.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="{{ form.via_administracion.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-syringe text-success me-1"></i>
-                                        {{ form.via_administracion.label }}
-                                    </label>
-                                    {{ form.via_administracion }}
-                                    {% if form.via_administracion.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.via_administracion.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Fila 4: Información Comercial -->
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <label for="{{ form.cantidad.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-boxes text-success me-1"></i>
-                                        {{ form.cantidad.label }}
-                                    </label>
-                                    {{ form.cantidad }}
-                                    {% if form.cantidad.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.cantidad.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.precio.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-dollar-sign text-success me-1"></i>
-                                        {{ form.precio.label }}
-                                    </label>
-                                    {{ form.precio }}
-                                    {% if form.precio.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.precio.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-4">
-                                    <label for="{{ form.foto.id_for_label }}" class="form-label fw-semibold">
-                                        <i class="fas fa-image text-success me-1"></i>
-                                        {{ form.foto.label }}
-                                    </label>
-                                    {{ form.foto }}
-                                    {% if form.foto.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.foto.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <!-- Fila 5: Configuración con Switches -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <div class="card bg-light border-0 p-3 rounded-3">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-shopping-cart text-info me-2"></i>
-                                                <div>
-                                                    <label class="form-check-label fw-semibold mb-0" for="{{ form.comercial.id_for_label }}">
-                                                        {{ form.comercial.label }}
-                                                    </label>
-                                                    <small class="text-muted d-block">¿Es de venta comercial?</small>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.tipo.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-layer-group"></i>
+                                                {{ form.tipo.label }}
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="field-with-button">
+                                                {{ form.tipo }}
+                                                <a href="{% url 'core:tipo_medicamento_crear' %}" class="btn-add-type" title="Agregar nuevo tipo de medicamento">
+                                                    <i class="fas fa-plus"></i>
+                                                </a>
+                                            </div>
+                                            {% if form.tipo.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.tipo.errors %}{{ error }}{% endfor %}
                                                 </div>
-                                            </div>
-                                            <div class="form-check form-switch">
-                                                {{ form.comercial }}
-                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    {% if form.comercial.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.comercial.errors %}{{ error }}{% endfor %}
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card bg-light border-0 p-3 rounded-3">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                <i class="fas fa-toggle-on text-success me-2"></i>
-                                                <div>
-                                                    <label class="form-check-label fw-semibold mb-0" for="{{ form.activo.id_for_label }}">
-                                                        {{ form.activo.label }}
-                                                    </label>
-                                                    <small class="text-muted d-block">¿Está disponible?</small>
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.marca_medicamento.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-trademark"></i>
+                                                {{ form.marca_medicamento.label }}
+                                                <span class="required">*</span>
+                                            </label>
+                                             <div class="field-with-button">
+                                                {{ form.marca_medicamento }}
+                                                <a href="{% url 'core:marca_medicamento_crear' %}" class="btn-add-type" title="Agregar nuevo tipo de medicamento">
+                                                    <i class="fas fa-plus"></i>
+                                                </a>
+                                            {% if form.marca_medicamento.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.marca_medicamento.errors %}{{ error }}{% endfor %}
                                                 </div>
-                                            </div>
-                                            <div class="form-check form-switch">
-                                                {{ form.activo }}
-                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
-                                    {% if form.activo.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.activo.errors %}{{ error }}{% endfor %}
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.nombre.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-pills"></i>
+                                                {{ form.nombre.label }}
+                                                <span class="required">*</span>
+                                            </label>
+                                            {{ form.nombre }}
+                                            {% if form.nombre.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.nombre.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
                                         </div>
-                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 2: Descripción -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-align-left"></i>
+                                        Descripción
+                                    </h5>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.descripcion.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-file-alt"></i>
+                                                {{ form.descripcion.label }}
+                                            </label>
+                                            {{ form.descripcion }}
+                                            {% if form.descripcion.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.descripcion.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 3: Especificaciones Técnicas -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-flask"></i>
+                                        Especificaciones Técnicas
+                                    </h5>
+                                </div>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.concentracion.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-vial"></i>
+                                                {{ form.concentracion.label }}
+                                            </label>
+                                            {{ form.concentracion }}
+                                            {% if form.concentracion.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.concentracion.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.via_administracion.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-syringe"></i>
+                                                {{ form.via_administracion.label }}
+                                            </label>
+                                            {{ form.via_administracion }}
+                                            {% if form.via_administracion.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.via_administracion.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 4: Información Comercial -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        Información Comercial
+                                    </h5>
+                                </div>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.cantidad.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-boxes"></i>
+                                                {{ form.cantidad.label }}
+                                            </label>
+                                            {{ form.cantidad }}
+                                            {% if form.cantidad.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.cantidad.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.precio.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-dollar-sign"></i>
+                                                {{ form.precio.label }}
+                                            </label>
+                                            {{ form.precio }}
+                                            {% if form.precio.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.precio.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group-modern">
+                                            <label for="{{ form.foto.id_for_label }}" class="form-label-modern">
+                                                <i class="fas fa-image"></i>
+                                                {{ form.foto.label }}
+                                            </label>
+                                            <div class="file-upload-wrapper">
+                                                {{ form.foto }}
+                                                <div class="file-upload-text">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    <span>Seleccionar imagen</span>
+                                                </div>
+                                            </div>
+                                            {% if form.foto.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.foto.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección 5: Configuración -->
+                            <div class="form-section">
+                                <div class="section-header">
+                                    <h5 class="section-title">
+                                        <i class="fas fa-cogs"></i>
+                                        Configuración
+                                    </h5>
+                                </div>
+                                
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <div class="switch-card">
+                                            <div class="switch-content">
+                                                <div class="switch-info">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                    <div>
+                                                        <span class="switch-title">{{ form.comercial.label }}</span>
+                                                        <small class="switch-description">¿Es de venta comercial?</small>
+                                                    </div>
+                                                </div>
+                                                <div class="switch-wrapper">
+                                                    {{ form.comercial }}
+                                                    <label for="{{ form.comercial.id_for_label }}" class="switch-label"></label>
+                                                </div>
+                                            </div>
+                                            {% if form.comercial.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.comercial.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="switch-card">
+                                            <div class="switch-content">
+                                                <div class="switch-info">
+                                                    <i class="fas fa-toggle-on"></i>
+                                                    <div>
+                                                        <span class="switch-title">{{ form.activo.label }}</span>
+                                                        <small class="switch-description">¿Está disponible?</small>
+                                                    </div>
+                                                </div>
+                                                <div class="switch-wrapper">
+                                                    {{ form.activo }}
+                                                    <label for="{{ form.activo.id_for_label }}" class="switch-label"></label>
+                                                </div>
+                                            </div>
+                                            {% if form.activo.errors %}
+                                                <div class="error-message">
+                                                    {% for error in form.activo.errors %}{{ error }}{% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Botones -->
-                            <div class="d-flex gap-3 justify-content-end mt-4">
-                                <a href="#" class="btn btn-outline-secondary px-4 rounded-pill">
-                                    <i class="fas fa-times me-2"></i>Cancelar
+                            <div class="form-actions">
+                                <a href="{% url 'home' %}" class="btn-modern btn-outline">
+                                    <i class="fas fa-times"></i>
+                                    <span>Cancelar</span>
                                 </a>
-                                <button type="submit" class="btn btn-success px-4 rounded-pill">
-                                    <i class="fas fa-save me-2"></i>Guardar Medicamento
+                                <button type="submit" class="btn-modern btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    <span>Guardar Medicamento</span>
                                 </button>
                             </div>
                         </form>
@@ -234,43 +327,562 @@
         </div>
     </div>
 
-    <!-- Estilos compactos -->
+    <!-- Estilos modernos -->
     <style>
+        :root {
+            --primary-color: #0c5da9;
+            --primary-light: #34ce57;
+            --primary-dark: #1e7e34;
+            --secondary-color: #20c997;
+            --accent-color: #17a2b8;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+            --background: #f8f9fa;
+            --surface: #ffffff;
+            --border: #e9ecef;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animaciones de entrada */
+        .header-animation {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header mejorado */
+        .icon-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .floating-icon {
+            position: relative;
+            z-index: 2;
+            width: 100px;
+            height: 100px;
+            background: var(--gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 10px 30px var(--shadow);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .icon-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            background: var(--gradient);
+            border-radius: 50%;
+            opacity: 0.1;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .title-gradient {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .divider-line {
+            width: 80px;
+            height: 4px;
+            background: var(--gradient);
+            margin: 20px auto;
+            border-radius: 2px;
+            animation: expand 1s ease-out 0.5s both;
+        }
+
+        @keyframes expand {
+            from { width: 0; }
+            to { width: 80px; }
+        }
+
+        /* Card principal con glassmorphism */
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px var(--shadow);
+            overflow: hidden;
+            animation: slideInUp 0.8s ease-out 0.3s both;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header-custom {
+            background: var(--gradient);
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-custom::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: rotate(45deg) translateX(-100%); }
+            50% { transform: rotate(45deg) translateX(100%); }
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .card-body-custom {
+            padding: 3rem;
+        }
+
+        /* Secciones del formulario */
+        .form-section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .form-section:nth-child(even) {
+            animation-delay: 0.1s;
+        }
+
+        .form-section:nth-child(odd) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .section-title {
+            color: var(--text-dark);
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            margin-left: 1rem;
+        }
+
+        /* Grupos de formulario modernos */
+        .form-group-modern {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label-modern {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .form-label-modern i {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .required {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        /* Inputs modernos */
         .form-control, .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 10px 14px;
-            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: var(--surface);
+            border-radius: var(--border-radius-sm);
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px var(--shadow-light);
+            position: relative;
         }
-        
+
         .form-control:focus, .form-select:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.15);
-        }
-        
-        .form-check-input {
-            width: 2.5rem;
-            height: 1.25rem;
-            border-radius: 1rem;
-            border: none;
-            background-color: #e9ecef;
-        }
-        
-        .form-check-input:checked {
-            background-color: #28a745;
-        }
-        
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .btn:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1);
             transform: translateY(-1px);
         }
-        
-        .card {
-            transition: all 0.3s ease;
+
+        .form-control:hover, .form-select:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Upload de archivos */
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            border: 2px dashed var(--border);
+            border-radius: var(--border-radius-sm);
+            background: var(--surface);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary-color);
+            background: rgba(40, 167, 69, 0.05);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-text {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-upload-text i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        /* Switches modernos */
+        .switch-card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-radius: var(--border-radius-sm);
+            padding: 1.5rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .switch-card:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .switch-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .switch-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .switch-info i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .switch-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: block;
+        }
+
+        .switch-description {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .switch-wrapper {
+            position: relative;
+        }
+
+        .switch-wrapper input[type="checkbox"] {
+            display: none;
+        }
+
+        .switch-label {
+            width: 60px;
+            height: 30px;
+            background: var(--border);
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+        }
+
+        .switch-label::before {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px var(--shadow);
+        }
+
+        .switch-wrapper input[type="checkbox"]:checked + .switch-label {
+            background: var(--primary-color);
+        }
+
+        .switch-wrapper input[type="checkbox"]:checked + .switch-label::before {
+            transform: translateX(30px);
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .error-message::before {
+            content: '⚠';
+            font-size: 0.8rem;
+        }
+
+        /* Alertas personalizadas */
+        .alert-custom {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            border: none;
+            backdrop-filter: blur(10px);
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--primary-dark);
+        }
+
+        .alert-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .alert-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            color: inherit;
+            opacity: 0.7;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+        /* Botones modernos */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-modern {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: var(--transition);
+        }
+
+        .btn-modern:hover::before {
+            left: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-dark);
+            border-color: var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--text-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-body-custom {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .floating-icon {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .icon-bg {
+                width: 100px;
+                height: 100px;
+            }
+        }
+
+        /* Efectos de microinteracción */
+        .form-group-modern:hover .form-label-modern i {
+            transform: scale(1.1);
+            transition: var(--transition);
+        }
+
+        .section-title:hover i {
+            transform: rotate(360deg);
+            transition: transform 0.6s ease;
         }
     </style>
 {% endblock %}
