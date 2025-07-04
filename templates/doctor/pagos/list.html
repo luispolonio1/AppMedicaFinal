@@ -5,108 +5,419 @@
 {% block content %}
 {% include 'fragments/messages.html' %}
 
-<section class="mt-4 bg-white dark:bg-principal">
-  <div class="container mx-auto px-4">
+<style>
+/* Estilos personalizados para la lista de pagos */
+.payment-card {
+    transition: all 0.3s ease;
+    border: 1px solid #d7dadc;
+    background-color: white;
+}
 
-    <!-- Título -->
-    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
-      Pagos
-    </h1>
+.payment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: #c4c7ca;
+}
 
-    <!-- Buscador -->
-    <div class="mt-6 flex justify-center">
-      <form method="get" class="relative w-full max-w-lg">
-        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
-        <input name="q" value="{{ request.GET.q }}" placeholder="Buscar por ID, pagador o referencia"
-               class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
-                      focus:outline-none focus:ring-2 focus:ring-sky-500
-                      bg-white text-gray-800 dark:bg-principal dark:text-gray-200">
-      </form>
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-pagado {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.status-pendiente {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.status-cancelado {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 40px;
+    transition: all 0.2s ease;
+    border-color: #d7dadc;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+    border-color: #0ea5e9;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-view {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: #0ea5e9;
+}
+
+.btn-view:hover {
+    background-color: rgba(14, 165, 233, 0.2);
+}
+
+.btn-edit {
+    background-color: rgba(215, 218, 220, 0.5);
+    color: #4b5563;
+}
+
+.btn-edit:hover {
+    background-color: rgba(215, 218, 220, 0.7);
+}
+
+.btn-delete {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+.btn-add {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.btn-add:hover {
+    background-color: rgba(16, 185, 129, 0.2);
+}
+
+.amount-badge {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border: 1px solid #d7dadc;
+}
+
+@media (max-width: 768px) {
+    .payment-card {
+        margin-bottom: 1rem;
+    }
+    
+    .hidden-mobile {
+        display: none;
+    }
+}
+</style>
+
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 border border-gray-200">
+            <div class="bg-blue-500 px-8 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white/20 rounded-full p-3">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl text-white font-black">Gestión de Pagos</h1>
+                            <p class="text-white text-sm">Administra todos los pagos del sistema</p>
+                        </div>
+                    </div>
+                    <!-- Botón Nuevo Pago -->
+                    <a href="{{ create_url }}" class="inline-flex items-center px-4 py-2 bg-white text-sky-800 font-semibold rounded-lg shadow hover:bg-sky-50 transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Nuevo Pago
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-sky-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Pagos</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ pagos|length }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Completados</p>
+                                <p class="text-2xl font-bold text-green-600">{{pagados}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Pendientes</p>
+                                <p class="text-2xl font-bold text-yellow-600">{{pendientes}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <div class="flex items-center">
+                            <div class="bg-sky-100 rounded-full p-2 mr-3">
+                                <svg class="w-4 h-4 text-sky-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Página Actual</p>
+                                <p class="text-2xl font-bold text-sky-800">{{ page_obj.number|default:1 }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filtros y búsqueda -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div class="search-container flex-1 max-w-md">
+                    <form method="get" class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input name="q" value="{{ request.GET.q }}" 
+                               type="text" 
+                               class="search-input block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500" 
+                               placeholder="Buscar por ID, pagador o referencia...">
+                    </form>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <select id="estadoFilter" class="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-sky-500 focus:border-sky-500">
+                        <option value="">Todos los estados</option>
+                        <option value="pagado">Pagado</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                    
+                    <a href="{% url 'home' %}" class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 focus:ring-sky-500 focus:border-sky-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m0 0h3m0 0h3m0 0a1 1 0 001-1V10M5 10H3"></path>
+                        </svg>
+                        Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de pagos -->
+        <div class="space-y-4">
+            {% if pagos %}
+                {% for p in pagos %}
+                <div class="payment-card bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200" 
+                     data-estado="{{ p.estado|lower }}" 
+                     data-id="{{ p.id }}"
+                     data-atencion="{{ p.atencion|lower }}">
+                    
+                    <div class="p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <!-- Icono del pago -->
+                                <div class="flex-shrink-0">
+                                    <div class="h-16 w-16 rounded-full bg-gradient-to-br from-sky-600 to-sky-800 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                
+                                <!-- Información del pago -->
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <h3 class="text-lg font-semibold text-gray-900">
+                                            Pago #{{ p.id }}
+                                        </h3>
+                                        <span class="status-badge {% if p.estado == 'pagado' %}status-pagado{% elif p.estado == 'Pendiente' %}status-pendiente{% else %}status-cancelado{% endif %}">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                {% if p.estado == 'pagado' %}
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                                {% elif p.estado == 'Pendiente' %}
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                                {% else %}
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                                {% endif %}
+                                            </svg>
+                                            {{ p.estado }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="mt-1 text-sm text-gray-600">
+                                        <p><strong>Atención:</strong> {{ p.atencion|default:"Sin especificar" }}</p>
+                                        <p><strong>Fecha:</strong> {{ p.fecha_pago|date:"d/m/Y H:i" }}</p>
+                                    </div>
+                                    
+                                    <div class="mt-2 flex items-center space-x-4 text-sm">
+                                        <span class="amount-badge">
+                                            ${{ p.monto_total }}
+                                        </span>
+                                        
+                                        <span class="flex items-center text-gray-500">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                            </svg>
+                                            ID: {{ p.id }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Acciones -->
+                            <div class="flex items-center space-x-2">
+                                <a href="{% url 'doctor:pago_update' p.id %}" class="action-btn btn-edit" title="Editar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
+                                
+                                <button class="action-btn btn-delete" 
+                                        title="Eliminar"
+                                        onclick="openDeleteModal('{{ p.id }}', 'Pago ID: {{ p.id }}')">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                                
+                                <a href="{% url 'doctor:detallepago_create' %}?pago={{ p.id }}" class="action-btn btn-add" title="Agregar detalle">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                </a>
+                                
+                                <a href="{% url 'doctor:detallepago_list' %}?pago={{ p.id }}" class="action-btn btn-view" title="Ver detalles">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Estado vacío -->
+                <div class="empty-state bg-white rounded-xl shadow-lg border border-gray-200">
+                    <div class="text-center py-12">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay pagos registrados</h3>
+                        <p class="mt-1 text-sm text-gray-500">Comienza creando tu primer pago.</p>
+                        <div class="mt-6">
+                            <a href="{{ create_url }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-sky-600 hover:bg-sky-700">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Crear Pago
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Paginación -->
+        {% include 'fragments/pagination.html' with page_obj=page_obj %}
     </div>
-
-    <!-- Tabla -->
-    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
-      <table class="w-full text-center text-sm md:text-base">
-        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
-          <tr>
-            <th class="py-3 px-4">ID</th>
-            <th class="py-3 px-4">Atención</th>
-            <th class="py-3 px-4">Monto</th>
-            <th class="py-3 px-4">Estado</th>
-            <th class="py-3 px-4">Fecha Pago</th>
-            <th class="py-3 px-4">Acciones</th>
-            <th class="py-3 px-4">Servicio Adicional</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in pagos %}
-          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario
-                     hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300
-                     text-gray-600 dark:text-gray-400">
-            <td class="py-4 px-4">{{ p.id }}</td>
-            <td class="py-4 px-4">{{ p.atencion|default:"—" }}</td>
-            <td class="py-4 px-4">{{ p.monto_total }}</td>
-            <td class="py-4 px-4">{{ p.estado }}</td>
-            <td class="py-4 px-4">{{ p.fecha_pago|date:"d/m/Y H:i" }}</td>
-            <td class="py-4 px-4">
-              <a href="{% url 'doctor:pago_update' p.id %}"
-                 class="text-sky-500 hover:text-sky-700 mx-1 transition-colors duration-200">
-                <i class="fa-solid fa-edit text-lg"></i>
-              </a>
-              <a href="#" class="text-red-600 hover:text-red-800 mx-1 transition-colors duration-200"
-                 onclick="openDeleteModal('{{ p.id }}', 'Pago ID: {{ p.id }}')">
-                <i class="fa-solid fa-trash text-lg"></i>
-              </a>
-            </td>
-            <td class="py-4 px-4 flex justify-center space-x-1">
-              <a href="{% url 'doctor:detallepago_create' %}?pago={{ p.id }}"
-                 class="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-full text-sm">
-                <i class="fa-solid fa-plus mr-1"></i>
-              </a>
-              <a href="{% url 'doctor:detallepago_list' %}?pago={{ p.id }}"
-                 class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-full text-sm">
-                <i class="fa-solid fa-eye mr-1"></i>
-              </a>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="px-6 py-4 text-gray-500 dark:text-gray-400">Sin pagos registrados.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Paginación -->
-    {% include 'fragments/pagination.html' with page_obj=page_obj %}
-
-    <!-- Botones -->
-    <div class="flex flex-col md:flex-row justify-center p-4 space-y-2 md:space-y-0 md:space-x-2">
-      <a href="{{ create_url }}"
-         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-plus mr-2"></i> Nuevo Pago
-      </a>
-      <a href="{% url 'home' %}"
-         class="bg-sky-600 hover:bg-sky-700 text-white py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
-        <i class="fa-solid fa-house mr-2"></i> Inicio
-      </a>
-    </div>
-  </div>
-</section>
+</div>
 
 <!-- Modal de eliminación -->
 {% include 'fragments/delete.html' %}
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Funcionalidad de filtros
+    const estadoFilter = document.getElementById('estadoFilter');
+    const paymentCards = document.querySelectorAll('.payment-card');
+    
+    function filterPayments() {
+        const estadoValue = estadoFilter ? estadoFilter.value.toLowerCase() : '';
+        
+        paymentCards.forEach(card => {
+            const estado = card.getAttribute('data-estado') || '';
+            const matchesEstado = !estadoValue || estado.includes(estadoValue);
+            
+            if (matchesEstado) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    if (estadoFilter) {
+        estadoFilter.addEventListener('change', filterPayments);
+    }
+});
+
 function openDeleteModal(id, texto) {
-  const deleteForm = document.getElementById('deleteForm');
-  deleteForm.action = "{% url 'doctor:pago_delete' 0 %}".replace('0', id);
-  document.getElementById('Description').textContent = texto;
-  document.getElementById('deleteModal').classList.remove('hidden');
+    const deleteForm = document.getElementById('deleteForm');
+    deleteForm.action = "{% url 'doctor:pago_delete' 0 %}".replace('0', id);
+    document.getElementById('Description').textContent = texto;
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
+
 function closeModal() {
-  document.getElementById('deleteModal').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
 }
 </script>
 {% endblock %}
