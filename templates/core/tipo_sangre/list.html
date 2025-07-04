@@ -1,120 +1,88 @@
 {% extends 'home.html' %}
-<title>{% block title %}{{ title }}{% endblock %}</title>
 {% load static %}
+<title>{% block title %}{{ title }}{% endblock %}</title>
+
 {% block content %}
-<section class="dark:bg-principal mt-2">
-  <div class="text-center" data-aos="fade-up" data-aos-delay="200">
-    <div class="sm:pt-8 lg:pt-4">
-      <h1 class="rounded-2xl bg-emerald-600 px-2 py-1 text-blue-800 uppercase text-4xl">
-        {{ title }}
-      </h1>
+<section class="mt-4 bg-white dark:bg-principal">
+  <div class="container mx-auto px-4">
+
+    <!-- Título -->
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 bg-sky-600 py-3 px-6 rounded-xl shadow-lg text-center uppercase">
+      {{ title }}
+    </h1>
+
+    <!-- Buscador -->
+    <div class="mt-6 flex justify-center">
+      <form method="get" class="relative w-full max-w-lg">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-sky-500"></i>
+        <input
+          type="text"
+          name="q"
+          value="{{ request.GET.q }}"
+          placeholder="Buscar tipo de sangre"
+          class="w-full pl-10 pr-4 py-2 rounded-lg shadow-md border border-sky-300
+                 focus:outline-none focus:ring-2 focus:ring-sky-500
+                 bg-white text-gray-800 dark:bg-principal dark:text-gray-200"
+        >
+      </form>
     </div>
 
-    <div class="lg:p-2 rounded-3xl" data-aos="fade-up" data-aos-delay="200">
-
-      <!-- Barra de búsqueda -->
-      <div class="p-4 flex justify-center">
-        <label for="table-search" class="sr-only">Buscar</label>
-        <div class="relative mt-1">
-          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-          </div>
-          <form method="GET">
-            <input type="text" name="q" id="table-search"
-              class="text-center pl-10 shadow-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2.5 pr-12 dark:bg-principal dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-400"
-              placeholder="Buscar tipo de sangre..." value="{{ request.GET.q }}">
-          </form>
-        </div>
-      </div>
-
-      <!-- Tabla -->
-      <div class="overflow-x-auto shadow-lg rounded-lg">
-        <table class="w-full text-center text-sm">
-          <thead class="uppercase font-Tiny5 bg-emerald-50 dark:bg-secundario dark:text-emerald-300 text-emerald-800">
-            <tr>
-              <th class="px-4 py-4">ID</th>
-              <th class="px-4 py-4">Tipo de Sangre</th>
-              <th class="px-4 py-4">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for tipo in tiposangre %}
-            <tr class="dark:text-gray-300 bg-white border-b dark:bg-[#0b1121] dark:border-secundario hover:bg-emerald-50 dark:hover:bg-[#121c33] transition-colors duration-200">
-              <td class="px-4 py-4 text-emerald-600 font-semibold">#{{ tipo.id }}</td>
-              <td class="px-4 py-4">{{ tipo.tipo }}</td>
-              <td class="px-4 py-4">
-                <div class="flex justify-center space-x-2">
-                  {% if permissions.delete_tiposangre %}
-                  <a href="#" class="text-red-600 dark:text-red-500 hover:text-red-800 p-1"
-                     onclick="openDeleteModal('{{ tipo.id }}', '{{ tipo.nombre }}')" title="Eliminar">
-                    <i class="fa-solid fa-trash text-lg"></i>
-                  </a>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-            {% empty %}
-            <tr>
-              <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                <div class="flex flex-col items-center">
-                  <i class="fa-solid fa-droplet text-4xl mb-2 text-gray-300"></i>
-                  <p class="text-lg">No se encontraron tipos de sangre</p>
-                  <p class="text-sm">Intenta con otros términos de búsqueda</p>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Paginación -->
-      {% if page_obj.paginator.num_pages > 1 %}
-      <div class="flex justify-center mt-6">
-        <nav>
-          <ul class="inline-flex -space-x-px shadow-sm rounded-lg">
-            {% if page_obj.has_previous %}
-            <li>
-              <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33]">
-                <i class="fa-solid fa-chevron-left mr-1"></i>Anterior
+    <!-- Tabla -->
+    <div class="mt-8 overflow-x-auto rounded-xl shadow-lg border border-sky-100 dark:border-secundario">
+      <table class="w-full text-center text-sm md:text-base">
+        <thead class="bg-sky-100 dark:bg-secundario uppercase text-gray-500 dark:text-gray-400 font-semibold">
+          <tr>
+            <th class="py-3 px-4">ID</th>
+            <th class="py-3 px-4">Tipo de Sangre</th>
+            <th class="py-3 px-4">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tipo in tiposangre %}
+          <tr class="bg-white dark:bg-[#0b1121] border-b border-sky-50 dark:border-secundario
+                     hover:bg-sky-50 dark:hover:bg-[#121c33] transition-colors duration-300
+                     text-gray-600 dark:text-gray-400">
+            <td class="py-4 px-4 font-semibold text-emerald-600">#{{ tipo.id }}</td>
+            <td class="py-4 px-4">{{ tipo.tipo }}</td>
+            <td class="py-4 px-4">
+              {% if permissions.delete_tiposangre %}
+              <a href="#" class="text-red-600 hover:text-red-800 mx-1 transition-colors duration-200"
+                 onclick="openDeleteModal('{{ tipo.id }}', '{{ tipo.nombre }}')">
+                <i class="fa-solid fa-trash text-lg"></i>
               </a>
-            </li>
-            {% endif %}
-            {% for num in page_obj.paginator.page_range %}
-            <li>
-              <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                class="flex items-center justify-center px-3 h-8 leading-tight {% if num == page_obj.number %}text-emerald-600 bg-emerald-50 border border-gray-300 hover:bg-emerald-100 dark:bg-secundario dark:border-principal dark:text-emerald-300{% else %}text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33] dark:hover:text-white{% endif %}">
-                {{ num }}
-              </a>
-            </li>
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <li>
-              <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-                class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 dark:bg-[#0b1121] dark:border-secundario dark:text-gray-400 dark:hover:bg-[#121c33]">
-                Siguiente<i class="fa-solid fa-chevron-right ml-1"></i>
-              </a>
-            </li>
-            {% endif %}
-          </ul>
-        </nav>
-      </div>
-      {% endif %}
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+              <div class="flex flex-col items-center">
+                <i class="fa-solid fa-droplet text-4xl mb-2 text-gray-300"></i>
+                <p class="text-lg">No se encontraron tipos de sangre</p>
+                <p class="text-sm">Intenta con otros términos de búsqueda</p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Botones -->
-      <div class="flex flex-col md:flex-row justify-center items-center gap-3 p-6">
-        {% if permissions.add_tiposangre %}
-       <a href="{% url 'core:tipo_sangre_create' %}"
-        class="bg-emerald-700 hover:bg-emerald-800 text-black py-3 px-6 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+    <!-- Paginación -->
+    {% include 'fragments/pagination.html' with page_obj=page_obj %}
+
+    <!-- Botones -->
+    <div class="flex flex-col md:flex-row justify-center items-center gap-3 p-6">
+      {% if permissions.add_tiposangre %}
+      <a href="{% url 'core:tipo_sangre_create' %}"
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
         <i class="fa-solid fa-plus mr-2"></i> Nuevo Tipo de Sangre
-        </a>
-        {% endif %}
-        <a href="{% url 'home' %}"
-           class="bg-blue-600 hover:bg-blue-700 text-black py-3 px-6 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
-          <i class="fa-solid fa-house"></i>
-        </a>
-      </div>
+      </a>
+      {% endif %}
+      <a href="{% url 'home' %}"
+         class="bg-sky-600 hover:bg-sky-700 text-gray-800 py-2 px-4 rounded-full shadow transition-colors duration-200 flex items-center justify-center">
+        <i class="fa-solid fa-house mr-2"></i> Inicio
+      </a>
     </div>
   </div>
 </section>
@@ -124,7 +92,7 @@
 <script>
 function openDeleteModal(id, nombre) {
   const deleteForm = document.getElementById('deleteForm');
-  deleteForm.action = `{% url 'core:tipo_sangre_delete' 0 %}`.replace('0', id);
+  deleteForm.action = "{% url 'core:tipo_sangre_delete' 0 %}".replace('0', id);
   document.getElementById('Description').textContent = `Tipo de Sangre #${id} - ${nombre}`;
   document.getElementById('deleteModal').classList.remove('hidden');
 }
