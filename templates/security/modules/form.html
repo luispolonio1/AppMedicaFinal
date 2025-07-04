@@ -73,6 +73,34 @@
               {% endfor %}
             </div>
 
+                        <!-- Campo Permissions -->
+                        <div class="field-container {% if form.permissions.errors %}has-error{% endif %}">
+                            <label for="{{ form.permissions.id_for_label }}"
+                                class="font-black uppercase text-lg block mb-2
+                                       {% if form.permissions.errors %}text-red-600 dark:text-red-400{% else %}dark:text-blue-300{% endif %}">
+                                {{ form.permissions.label }}
+                                {% if form.permissions.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            <div class="relative {% if form.permissions.errors %}border-2 border-red-300 dark:border-red-600 rounded-lg p-2 bg-red-50 dark:bg-red-900/20{% endif %}">
+                                {{ form.permissions }}
+                                {% if form.permissions.errors %}
+                                <div class="absolute top-2 right-2 pointer-events-none">
+                                    <i class="fa-solid fa-exclamation-circle text-red-500"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% if form.permissions.errors %}
+                            <div class="mt-2 text-red-600 dark:text-red-400 text-sm">
+                                {% for error in form.permissions.errors %}
+                                <div class="flex items-center mt-1">
+                                    <i class="fa-solid fa-circle-exclamation text-xs mr-2"></i>
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
             <!-- Campo Menu -->
             <div class="{% if form.menu.errors %}has-error{% endif %}">
               <label for="{{ form.menu.id_for_label }}"
@@ -215,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ['input','keyup','change'].forEach(e => iconInput.addEventListener(e, updatePreview));
 });
 
+
 // Permisos
 document.addEventListener('DOMContentLoaded', () => {
   const moduleId = '{{ form.instance.pk|default_if_none:"" }}';
@@ -245,5 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
     [...assigned.selectedOptions].forEach(o=>avail.add(o));
   };
 });
+
 </script>
 {% endblock %}

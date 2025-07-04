@@ -11,8 +11,6 @@ from applications.doctor.views.AtencionCita import AtenderPacienteView
 from applications.doctor.views.pago import PagoListView, PagoCreateView, PagoUpdateView, PagoDeleteView
 from applications.doctor.views.detalle_pago import DetallePagoListView, DetallePagoCreateView, \
     DetallePagoUpdateView, DetallePagoDeleteView    
-
-
 from applications.doctor.views.horario_atencion import HorarioAtencionListView, HorarioAtencionCreateView, \
     HorarioAtencionUpdateView, HorarioAtencionDeleteView  
 

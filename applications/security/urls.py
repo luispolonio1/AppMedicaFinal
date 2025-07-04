@@ -20,7 +20,7 @@ urlpatterns = [
   path('module_delete/<int:pk>/', ModuleDeleteView.as_view(),name='module_delete'),
 
   path('get-permissions/<int:pk>/', get_permissions, name='get_permissions'),
-    path('get-all-permissions/', get_all_permissions, name='get_all_permissions'),
+  path('get-all-permissions/', get_all_permissions, name='get_all_permissions'),
 
 # rutas de gruposmodulospermisos
   path('group_module_permission_list/', GroupModulePermissionListView.as_view(), name='group_module_permission_list'),

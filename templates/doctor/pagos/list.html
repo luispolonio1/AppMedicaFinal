@@ -33,6 +33,7 @@
             <th class="px-6 py-3">Estado</th>
             <th class="px-6 py-3">Fecha Pago</th>
             <th class="px-6 py-3">Acciones</th>
+            <th class="px-6 py-3">Servicio Adicional</th>
           </tr>
         </thead>
         <tbody>
@@ -51,11 +52,22 @@
                  onclick="openDeleteModal('{{ p.id }}', 'Pago ID: {{ p.id }}')">
                 <i class="fa-solid fa-trash text-lg"></i>
               </a>
+              </a>
+            </td>
+            <td class="px-6 py-4">
+              <a href="{% url 'doctor:detallepago_create' %}?pago={{ p.id }}" 
+                 class="bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-full text-sm">
+                <i class="fa-solid fa-plus mr-1"></i> 
+              </a>
+              <a href="{% url 'doctor:detallepago_list' %}?pago={{ p.id }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-full text-sm">
+                  <i class="fa-solid fa-eye mr-1"></i> 
+                </a>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="6" class="px-6 py-4">Sin pagos registrados.</td>
+            <td colspan="7" class="px-6 py-4">Sin pagos registrados.</td>
           </tr>
           {% endfor %}
         </tbody>
